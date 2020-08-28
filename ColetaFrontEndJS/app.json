@@ -1,0 +1,21 @@
+{
+  "name": "APPColeta",
+  "displayName": "APPColeta",
+  "expo": {
+    "name": "APPColeta",
+    "slug": "APPColeta",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "platforms": [
+    "ios",
+    "android"
+  ],
+  "android": {
+    "package": "com.selita.appBareUpdate",
+    "versionCode": 1,
+    "publishManifestPath": "https://exp.host/@jonathasgoncalves/APPColeta"
+  }
+}

@@ -1,0 +1,7 @@
+select distinct motorista.imei 
+from coleta_leite.motorista 
+join transportadora 
+on (motorista.cod_motorista = transportadora.COD_MOTORISTA) 
+where transportadora.PLACA = 'mtc7995';
+
+delete from motorista where motorista.imei = 'jjjjjsssss2233d'

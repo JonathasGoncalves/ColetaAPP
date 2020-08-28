@@ -1,0 +1,74 @@
+Inciando o APP:
+-Busco o IMEI
+-Verifico se tem cadastro
+-Se tiver, avança direto para a tela de linha dele
+-Se não tiver, avisar que não tem e abrir tela de transportadora para serem selecionadas e associadas aquele IMEI;
+-Finaliza, vai para a tela de Linhas
+
+Primeira tela:
+Listagem das rotas as quais a trasnportadora da placa pertence.
+Funções Backend:
+PlacasALL(returna Nome Motorista, Placa(em destaque))
+
+Tela de listagem de rotas:
+Listar as rotas da transportadora, ao clicar na rota selecionada encaminhar para a tela de listagem de tanques da rota;
+Funções Backend:
+LinhasPorTransportadora(returna Numero Linha, Nome Linha)
+
+Tela de listagem de tanques:
+Listar os tanques da rota selecionada exibindo algumas informações básicas de cada um, manter um campo para filtro 
+(auto complete),
+mater um botão para a transmissão das informações.
+Funções Backend:
+TanquesPorLinha(retorna Linha, codigo produtor, nome produtor, tanque, Municipio)
+
+Ação de clicar no tanque:
+Ao clicar no tanque, levar para a tela de informações basicas sobre o tanque (Atualmente, temperatura e odômetro).
+Ao confirmar levar para a tela de listagem de latões daquele tanque;
+
+Tela de listagem de latões:
+Exbir uma listagem dos latões com informações básicas, a quantidade de leite já coletada para cada latão (Nessa coleta),
+exbir o total coletado para o tanque e um botão para finalizar o tanque;
+Funcões Backend:
+LataoPorTanque(latao, linha, codigo produtor, nome produtor, tanque, Municipio)
+
+Ação de clicar no latão:
+Atualizar posição geografica do latão, exibir informações básicas do tanque e do latão e exbibir input de quantidade de leite coletada.
+Ao salvar local e voltar para a listagem de latões.
+
+
+Na balança, o usuario insere a placa e o protheus faz uma requisição das coletas não finalizadas para aquela placa;
+Ação ColetaPorPlaca
+
+Formato arquivo enviado:
+Data     Transportador   Motorista     Veiculo
+20200608 00468           0000019       000001
+
+Arquivo coleta
+Linha  Produtor Tanque Latão  Quantidade  hora  Temp   boca 
+000054 000000   000017  001769 00000000229 1634  3,00   1
+
+
+
+linha, tanque, data, hora, cod_ocorrencia, valor fora do padrao, observações
+
+cria coleta, cria itens de coleta e guarda, associa itens de coleta a uma coleta
+
+
+observações:
+No momento da transmissão buscar os tanques in linhas novamente.
+
+Requisita coletas em aberto
+   Com o id da coleta buscar os arquivos por I
+
+
+Falta tratar a inserção de ocorrencias e depois gerar o arquivos das mesmas
+
+
+
+
+
+
+
+
+

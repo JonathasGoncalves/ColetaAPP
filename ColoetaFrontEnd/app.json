@@ -1,0 +1,12 @@
+{
+  "name": "ColetaAPP",
+  "displayName": "ColetaAPP",
+  "expo": {
+    "name": "ColetaAPP",
+    "slug": "ColetaAPP",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
