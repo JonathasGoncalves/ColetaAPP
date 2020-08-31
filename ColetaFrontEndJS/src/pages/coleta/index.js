@@ -20,11 +20,20 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
   const [loading, setLoading] = useState(true);
   const [lataoCont, setLataoCont] = useState(true);
   const [totalColetadoState, setTotalColetado] = useState(0);
+  const [totalColetadoOffState, setTotalColetadoOffState] = useState(0);
 
   useEffect(() => {
+    console.log('id_linha');
+    console.log(id_linha);
 
-    total = calcularTotalColetado(coleta);
-    setTotalColetado(total);
+    if (coleta) {
+      total = calcularTotalColetado(coleta);
+      console.log(total);
+      setTotalColetado(total.total);
+      setTotalColetadoOffState(total.totalOff);
+    }
+
+
     navigation.setOptions({
       headerRight: () => (
         <View>
@@ -196,7 +205,8 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
       save_coleta(copyColeta);
       AsyncStorage.setItem('@coleta', JSON.stringify(copyColeta));
       total = calcularTotalColetado(copyColeta);
-      setTotalColetado(total);
+      setTotalColetado(total.total);
+      setTotalColetadoOffState(total.totalOff);
       setLoading(false);
     }
 
@@ -210,7 +220,7 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
             <Text allowFontScaling={false} style={styles.textNome}>
               {tanque.lataoList.length}/{cont}
             </Text>
-            <Text allowFontScaling={false} style={styles.textNome}>
+            <Text allowFontScaling={false} style={tanque.cod_ocorrencia == '' ? styles.textNome : styles.textNomeVolumeFora}>
               {tanque.volume}
             </Text>
           </View>
@@ -255,9 +265,16 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
               />
             </View>
 
-            <View style={styles.viewTotalColetado}>
-              <Text style={styles.textTotalColetado}>Total Coletado</Text>
-              <Text style={styles.ValueTotalColetado}>{totalColetadoState}</Text>
+            <View style={{ flexDirection: 'row', flex: 1 }}>
+              <View style={styles.viewTotalColetado}>
+                <Text style={styles.textTotalColetado}>Total Coletado</Text>
+                <Text style={styles.ValueTotalColetado}>{totalColetadoState}</Text>
+              </View>
+              <View style={styles.viewTotalColetado}>
+                <Text style={styles.textTotalColetado}>Total Fora do Padrão</Text>
+                <Text style={styles.ValueTotalColetado}>{totalColetadoOffState}</Text>
+              </View>
+
             </View>
           </View>
         ) : (

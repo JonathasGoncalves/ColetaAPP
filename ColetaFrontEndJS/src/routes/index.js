@@ -9,22 +9,26 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { ActivityIndicator } from 'react-native';
 import getRealm from '../services/realm';
 
-function Routes({ save_linhaID, save_linhas, identificado, saveImei, save_linha, save_coleta, adicionar_horaF, adicionar_horaI, transmitir_coleta, save_tanque, adicionar_data }) {
+function Routes({ save_linhaID, save_linhas, identificado, saveVeiculo, save_linha, save_coleta, adicionar_horaF, adicionar_horaI, transmitir_coleta, save_tanque, adicionar_data }) {
   const [verificar, setVerificar] = useState(true);
 
   useEffect(() => {
     async function verificarImei() {
 
-      await AsyncStorage.clear();
+      /*await AsyncStorage.clear();
       const realm = await getRealm();
       Realm.deleteFile({
         path: realm.path
-      })
+      })*/
 
-      const imei = await AsyncStorage.getItem('@imei');
-      if (imei) {
+      const veiculo = await AsyncStorage.getItem('@veiculo');
+      console.log('veiculo');
+      console.log(veiculo);
+      if (veiculo) {
+        console.log('emAbertoStorage1 emAbertoStorage1');
         const emAbertoStorage = await AsyncStorage.getItem('@emAberto');
         if (emAbertoStorage == 'true') {
+          console.log('emAbertoStorage emAbertoStorage');
           const coletaStoragetemp = await AsyncStorage.getItem('@coleta');
           const coletaStorage = JSON.parse(coletaStoragetemp);
           const tanqueAtualS = await AsyncStorage.getItem('@tanqueAtual');
@@ -51,7 +55,10 @@ function Routes({ save_linhaID, save_linhas, identificado, saveImei, save_linha,
           }
         }
         const placaStorage = await AsyncStorage.getItem('@placa');
-        await saveImei(imei, placaStorage);
+        const veiculoTemp = JSON.parse(veiculo);
+        console.log('veiculoTemp');
+        console.log(veiculoTemp);
+        await saveVeiculo(veiculoTemp);
       }
       setVerificar(false);
     }

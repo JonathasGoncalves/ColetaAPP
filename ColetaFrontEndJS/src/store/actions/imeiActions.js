@@ -1,16 +1,17 @@
-export function saveImei(imei, placa) {
+export function saveVeiculo(veiculo) {
   return {
-    type: 'SAVE_IMEI',
-    imei,
-    identificado: true,
-    placa
+    type: 'SAVE_VEICULO',
+    veiculo,
+    identificado: true
   };
 }
 
-export function save_placa(placa) {
+
+export function removerID() {
   return {
-    type: 'SAVE_PLACA',
-    placa,
+    type: 'REMOVER_ID',
+    identificado: false
   };
 }
+
 

@@ -10,9 +10,10 @@ import api from '../../services/api';
 import AsyncStorage from '@react-native-community/async-storage';
 import { time } from '../../functions/tempo';
 import { CommonActions } from '@react-navigation/native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import * as actionsIMEI from '../../store/actions/imeiActions';
 
-const Finalizar = ({ id_coleta, linhas, coleta, data, horaI, horaF, finalizar_coleta, navigation, save_coleta, cod_linha, placa, transmitir_coleta, adicionar_horaF, imei }) => {
+const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, finalizar_coleta, navigation, save_coleta, cod_linha, placa, transmitir_coleta, adicionar_horaF, imei }) => {
 
   const [loading, setLoading] = useState(false);
   const [transmitindo, setTransmitindo] = useState(false);
@@ -121,7 +122,6 @@ const Finalizar = ({ id_coleta, linhas, coleta, data, horaI, horaF, finalizar_co
           }
         })
       })
-
     })
     setLoading(false);
   }
@@ -142,13 +142,12 @@ const Finalizar = ({ id_coleta, linhas, coleta, data, horaI, horaF, finalizar_co
       var year = new Date().getFullYear();
       const dataHJ = year + '/' + mes + '/' + date;
 
-      const responseTransportadora = await api.post('api/transportadora/transportadoraPorPlaca', {
-        linha: cod_linha,
-        placa: placa
-      })
+      const veiculoTemp = await AsyncStorage.getItem('@veiculo');
+      const veiculo = JSON.parse(veiculoTemp);
+      console.log(veiculoTemp);
 
       const responseColeta = await api.post('api/coleta/NovaColeta', {
-        cod_transportadora: responseTransportadora.data.transportadora.COD_TRANSPORTADORA,
+        cod_transportadora: veiculo.COD_TRANSPORTADORA,
         data: dataHJ
       })
 
@@ -189,6 +188,7 @@ const Finalizar = ({ id_coleta, linhas, coleta, data, horaI, horaF, finalizar_co
           })
         })
       })
+
       try {
         const responseTanques = await api.post('api/coleta/NovaColetaItem', {
           coletas: coletaRequest
@@ -199,7 +199,8 @@ const Finalizar = ({ id_coleta, linhas, coleta, data, horaI, horaF, finalizar_co
         realm.write(() => {
           realm.delete(allColetas)
         })
-        await AsyncStorage.multiRemove(['@emAberto', '@coleta', '@linha', '@finalizado']);
+        removerID();
+        await AsyncStorage.multiRemove(['@emAberto', '@coleta', '@linha', '@finalizado', '@veiculo']);
         const emAbertoStorage = await AsyncStorage.getItem('@emAberto');
 
         await AsyncStorage.setItem('@transmitir', 'false');
@@ -284,7 +285,6 @@ const Finalizar = ({ id_coleta, linhas, coleta, data, horaI, horaF, finalizar_co
                   <Text allowFontScaling={false} style={styles.itemColetaInfo}>Hora Ínicio</Text>
                   <Text allowFontScaling={false} style={styles.itemColetaInfoLast}>Hora Fim</Text>
                 </View>
-
                 <View>
                   <Text allowFontScaling={false} style={styles.itemColetaResp}>{data}</Text>
                   <Text allowFontScaling={false} style={styles.itemColetaResp}>{tanques}</Text>
@@ -294,10 +294,8 @@ const Finalizar = ({ id_coleta, linhas, coleta, data, horaI, horaF, finalizar_co
                   <Text allowFontScaling={false} style={styles.itemColetaResp}>{horaI}</Text>
                   <Text allowFontScaling={false} style={styles.itemColetaRespLast}>{horaF}</Text>
                 </View>
-
               </View>
             </View>
-
             <Button
               block
               style={loading || transmitindo ? styles.buttonContinuarPress : styles.buttonContinuar}
@@ -330,12 +328,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch =>
-  bindActionCreators(actionsColeta, dispatch);
+  bindActionCreators({ ...actionsIMEI, ...actionsColeta }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(Finalizar);
-
-
-/*
-
-
-                */

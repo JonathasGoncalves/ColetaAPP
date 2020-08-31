@@ -52,6 +52,12 @@ const styles = StyleSheet.create({
     marginLeft: 60,
     marginRight: 15
   },
+  textNomeVolumeFora: {
+    fontSize: 18,
+    color: 'red',
+    marginLeft: 60,
+    marginRight: 15
+  },
   viewMain: {
     marginRight: 10,
     marginLeft: 10,
@@ -67,12 +73,12 @@ const styles = StyleSheet.create({
   },
   viewTotalColetado: {
     backgroundColor: '#e5e8e8',
-    marginLeft: 10,
+    //marginLeft: 10,
     marginTop: 10,
-    alignSelf: 'center',
+    //alignSelf: 'center',
     alignItems: 'center',
     height: (Dimensions.get("window").height) * 0.2,
-    width: Dimensions.get("window").width,
+    width: Dimensions.get("window").width * 0.5,
   },
   textTitulo: {
     fontSize: 20,

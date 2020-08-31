@@ -31,12 +31,13 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
   const [editableLabel, setEditableLabel] = useState(true);
   const [dateSave, setDate] = useState('');
   const [totalColetadoState, setTotalColetado] = useState(0);
-
+  const [totalColetadoOffState, setTotalColetadoOffState] = useState(0);
 
   useEffect(() => {
-
+    console.log(coleta[0].coleta[0]);
     total = calcularTotalColetado(coleta);
-    setTotalColetado(total);
+    setTotalColetado(total.total);
+    setTotalColetadoOffState(total.totalOff)
 
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
 
@@ -44,9 +45,8 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
       setLatitude(String(geolocation.coords.latitude));
       setLongitude(String(geolocation.coords.longitude));
     }
-
     try {
-      Geolocation.getCurrentPosition(info => setLocalizacao(info));
+      //Geolocation.getCurrentPosition(info => setLocalizacao(info));
     } catch (error) {
       Alert.alert(
         'Atenção!',
@@ -56,15 +56,13 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
         ]
       );
     }
-
-
     setObs(tanqueAtual.observacao);
     setTemperatura(tanqueAtual.temperatura);
     setOdometro(tanqueAtual.odometro);
 
     if (tanqueAtual.cod_ocorrencia != '') {
       setObsType(tanqueAtual.cod_ocorrencia);
-      setEditableLabel(false);
+      //setEditableLabel(false);
     }
 
     navigation.setOptions({
@@ -138,6 +136,8 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
   }
 
   function coletarLatao(latao) {
+    /*console.log('latao');
+    console.log(coleta[0].coleta[0]);*/
     setVolume(latao.volume);
     setLatao(latao.latao);
     setColetando(true);
@@ -152,14 +152,13 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
     var tanqueTemp = {};
     copyColeta[id_linha].coleta.map((tanqueMap) => {
       if (tanqueMap.tanque == tanqueAtual.tanque) {
-        //tanqueTemp = tanqueMap;
-
+        if (obsType == '003') {
+          tanqueMap.volume = parseInt(volume);
+        }
         tanqueMap.lataoList.map((listLatao) => {
           listLatao.hora = timeFormat;
           listLatao.data = dataFormat;
         })
-        tanqueMap.volume = parseInt(volume);
-
         tanqueMap.cod_ocorrencia = obsType;
         tanqueMap.observacao = obs;
         tanqueMap.odometro = odometro;
@@ -167,6 +166,7 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
         tanqueTemp = tanqueMap;
       }
     })
+
     save_tanque(tanqueTemp);
     await AsyncStorage.setItem('@tanqueAtual', JSON.stringify(tanqueTemp));
     await AsyncStorage.setItem('@coleta', JSON.stringify(copyColeta));
@@ -188,7 +188,7 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
     var contColeta = 0;
     var tanqueTemp = {};
 
-
+    console.log(copyColeta[id_linha]);
     copyColeta[id_linha].coleta.map((tanqueMap) => {
       if (tanqueMap.tanque == tanqueAtual.tanque) {
         //tanqueTemp = tanqueMap;
@@ -196,18 +196,13 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
         tanqueMap.lataoList.map((listLatao) => {
           if (latao == listLatao.latao) {
             tanqueTemp = tanqueMap;
-            if (tanqueMap.cod_ocorrencia == '') {
-              if (tanqueMap.volume > 0) {
-                tanqueMap.volume = parseInt(tanqueMap.volume) - parseInt(listLatao.volume) + parseInt(volume);
-              }
-              listLatao.volume = parseInt(volume);
-            } else {
+            if (tanqueMap.volume > 0) {
               tanqueMap.volume = parseInt(tanqueMap.volume) - parseInt(listLatao.volume) + parseInt(volume);
-              listLatao.volume = parseInt(volume);
-              //tanqueMap.volume = parseInt(tanqueMap.volume) + parseInt(volume);
             }
+            listLatao.volume = parseInt(volume);
           }
         })
+        console.log(parseInt(volume));
         tanqueMap.volume = parseInt(volume);
         tanqueMap.cod_ocorrencia = obsType;
         tanqueMap.observacao = obs;
@@ -216,9 +211,10 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
         tanqueTemp = tanqueMap;
       }
     })
-
+    console.log(copyColeta[id_linha]);
     total = calcularTotalColetado(coleta);
-    setTotalColetado(total);
+    setTotalColetado(total.total);
+    setTotalColetadoOffState(total.totalOff)
 
     save_tanque(tanqueTemp);
     await AsyncStorage.setItem('@tanqueAtual', JSON.stringify(tanqueTemp));
@@ -230,13 +226,13 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
   function setObsTypeFunction(type) {
     if (type == obsType) {
       setObsType('');
-      setTemperatura(0);
-      setOdometro('');
-      setEditableLabel(true);
+      //setTemperatura(0);
+      //setOdometro('');
+      //setEditableLabel(true);
     } else {
-      setTemperatura(0);
-      setOdometro('');
-      setEditableLabel(false);
+      //setTemperatura(0);
+      //setOdometro('');
+      //setEditableLabel(false);
       setObsType(type);
     }
   }
@@ -263,7 +259,12 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
     var copyColeta = coleta;
     console.log(index);
     console.log(indexTanque);
-    copyColeta[id_linha].coleta[indexTanque].volume = parseInt(copyColeta[id_linha].coleta[indexTanque].volume) - parseInt(copyColeta[id_linha].coleta[indexTanque].lataoList[index].volume);
+    temp = parseInt(copyColeta[id_linha].coleta[indexTanque].volume);
+    temp2 = parseInt(copyColeta[id_linha].coleta[indexTanque].lataoList[index].volume);
+    console.log('temp - temp2');
+    console.log(temp);
+    console.log(copyColeta[id_linha].coleta[indexTanque]);
+    copyColeta[id_linha].coleta[indexTanque].volume = temp - temp2;
     //copyColeta[id_linha].coleta[indexTanque].volume = copyColeta[id_linha].coleta[indexTanque].volume - copyColeta[id_linha].coleta[indexTanque].lataoList[index].volume_fora_padrao;
     copyColeta[id_linha].coleta[indexTanque].lataoList[index].hora = '';
     copyColeta[id_linha].coleta[indexTanque].lataoList[index].data = '';
@@ -275,7 +276,8 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
 
     save_coleta(copyColeta);
     total = calcularTotalColetado(copyColeta);
-    setTotalColetado(total);
+    setTotalColetado(total.total);
+    setTotalColetadoOffState(total.totalOff)
     AsyncStorage.setItem('@coleta', JSON.stringify(copyColeta));
     setLoading(false);
   }
@@ -505,9 +507,15 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
                   renderItem={({ item }) => renderLataoList(item)}
                 />
               </View>
-              <View style={styles.viewTotalColetado}>
-                <Text style={styles.textTotalColetado}>Total Coletado</Text>
-                <Text style={styles.ValueTotalColetado}>{totalColetadoState}</Text>
+              <View style={{ flexDirection: 'row', flex: 1 }}>
+                <View style={styles.viewTotalColetado}>
+                  <Text style={styles.textTotalColetado}>Total Coletado</Text>
+                  <Text style={styles.ValueTotalColetado}>{totalColetadoState}</Text>
+                </View>
+                <View style={styles.viewTotalColetado}>
+                  <Text style={styles.textTotalColetado}>Total Fora do Padrão</Text>
+                  <Text style={styles.ValueTotalColetado}>{totalColetadoOffState}</Text>
+                </View>
               </View>
             </View>
           )

@@ -1,25 +1,25 @@
 
 const INITIAL_STATE = {
-  imei: '',
-  placa: '',
+  veiculo: {},
   identificado: false
 }
 
 
 export default function Identificacao(state = INITIAL_STATE, action) {
   switch (action.type) {
-    case 'SAVE_IMEI':
+    case 'SAVE_VEICULO':
       return {
         ...state,
-        imei: action.imei,
-        identificado: action.identificado,
-        placa: action.placa
+        veiculo: action.veiculo,
+        identificado: action.identificado
       }
-    case 'SAVE_PLACA':
+    case 'REMOVER_ID':
       return {
-        placa: action.placa,
+        ...state,
+        identificado: action.identificado
       }
     default:
       return state;
   }
 }
+

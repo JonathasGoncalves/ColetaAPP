@@ -13,7 +13,7 @@ import getRealm from '../../../services/realm';
 import Realm from 'realm';
 import * as actionsColeta from '../../../store/actions/coletaActions';
 
-const Cadastro = ({ saveImei, save_placa, save_coleta, save_linhas }) => {
+const Cadastro = ({ saveVeiculo, save_placa, save_coleta, save_linhas }) => {
   const [placa, setPlaca] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -27,17 +27,16 @@ const Cadastro = ({ saveImei, save_placa, save_coleta, save_linhas }) => {
           placa: placa
         })
 
-        await AsyncStorage.setItem('@placa', placa);
-
         try {
-          const responseCad = await api.post('api/transportadora/cadastrarIMEI', {
-            transportadora: response.data.motorista.COD_TRANSPORTADORA,
-            IMEI: imeiLocal
-          })
+          console.log(response.data.motorista);
+          await AsyncStorage.setItem('@veiculo', JSON.stringify(response.data.motorista));
 
-          await AsyncStorage.setItem('@imei', imeiLocal);
-          const responseLinhas = await api.post('api/linha/linhasPorIMEI', {
-            IMEI: imeiLocal
+          const tempVeiculo = await AsyncStorage.getItem('@veiculo');
+          console.log(tempVeiculo);
+          //console.log(response.data.motorista);
+
+          const responseLinhas = await api.post('api/linha/linhasPorVeiculo', {
+            veiculo: response.data.motorista.VEICULO
           })
           linhas = [];
           for (linhaItem of responseLinhas.data.linhas) {
@@ -45,8 +44,7 @@ const Cadastro = ({ saveImei, save_placa, save_coleta, save_linhas }) => {
           }
           const responseTanques = await api.post('api/tanque/TanquesInLinhas', {
             linhas: linhas
-          })
-
+          });
           save_linhas(linhas);
           await AsyncStorage.setItem('@linhas', JSON.stringify(linhas));
           //gerando array de array para as possiveis coletas de cada linha
@@ -77,9 +75,10 @@ const Cadastro = ({ saveImei, save_placa, save_coleta, save_linhas }) => {
               realm.create('Tanque', tanqueUnidade);
             });
           }
-          saveImei(imeiLocal, placa);
+          saveVeiculo(response.data.motorista);
 
         } catch (error) {
+          console.log(error);
           Alert.alert(
             'Erro',
             JSON.stringify(error),
@@ -109,7 +108,7 @@ const Cadastro = ({ saveImei, save_placa, save_coleta, save_linhas }) => {
 
     <View style={{ backgroundColor: 'white' }}>
 
-      <Image style={{ alignSelf: 'center' }} source={require('../../../imagens/iconeCaminhao.jpg')} />
+      <Image style={{ alignSelf: 'center' }} source={require('../../coleta/imagens/iconeCaminhao.jpg')} />
       <Text allowFontScaling={false} style={styles.textDescPlaca}>
         Este é seu primeiro acesso no nosso aplicativo de coleta de leite!
         O primeiro passo antes de poder utilizar o APP é inserir a placa do veículo.

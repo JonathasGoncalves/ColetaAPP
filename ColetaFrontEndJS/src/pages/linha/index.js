@@ -104,6 +104,8 @@ const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar
 
     const hora = time();
     const data = date();
+    console.log('@linha');
+    console.log(cod_linha);
     await AsyncStorage.setItem('@linha', cod_linha);
     save_linha(cod_linha);
     adicionar_horaI(hora);

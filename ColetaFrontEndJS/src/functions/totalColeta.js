@@ -1,12 +1,18 @@
 export default function calcularTotalColetado(coleta) {
-  total = 0;
+
+  volume = {
+    total: 0,
+    totalOff: 0,
+  }
   coleta.map((coleta) => {
     coleta.coleta.map((ItemColeta) => {
       if (ItemColeta.cod_ocorrencia == '') {
-        total += ItemColeta.volume;
+        volume.total += ItemColeta.volume;
+      } else {
+        volume.totalOff += ItemColeta.volume;
       }
     })
   })
 
-  return total;
+  return volume;
 }
