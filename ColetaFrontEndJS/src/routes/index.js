@@ -22,13 +22,10 @@ function Routes({ save_linhaID, save_linhas, identificado, saveVeiculo, save_lin
       })*/
 
       const veiculo = await AsyncStorage.getItem('@veiculo');
-      console.log('veiculo');
-      console.log(veiculo);
+
       if (veiculo) {
-        console.log('emAbertoStorage1 emAbertoStorage1');
         const emAbertoStorage = await AsyncStorage.getItem('@emAberto');
         if (emAbertoStorage == 'true') {
-          console.log('emAbertoStorage emAbertoStorage');
           const coletaStoragetemp = await AsyncStorage.getItem('@coleta');
           const coletaStorage = JSON.parse(coletaStoragetemp);
           const tanqueAtualS = await AsyncStorage.getItem('@tanqueAtual');
@@ -49,15 +46,13 @@ function Routes({ save_linhaID, save_linhas, identificado, saveVeiculo, save_lin
           save_linhas(linhas);
           save_linhaID(idlinha);
           if (coletaStorage != null) {
-            console.log('coletaStorage != null');
-            console.log(coletaStorage[0].coleta);
             save_coleta(coletaStorage);
+          } else {
+            save_coleta([]);
           }
         }
         const placaStorage = await AsyncStorage.getItem('@placa');
         const veiculoTemp = JSON.parse(veiculo);
-        console.log('veiculoTemp');
-        console.log(veiculoTemp);
         await saveVeiculo(veiculoTemp);
       }
       setVerificar(false);

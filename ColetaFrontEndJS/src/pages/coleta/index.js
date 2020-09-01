@@ -23,8 +23,6 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
   const [totalColetadoOffState, setTotalColetadoOffState] = useState(0);
 
   useEffect(() => {
-    console.log('id_linha');
-    console.log(id_linha);
 
     if (coleta) {
       total = calcularTotalColetado(coleta);
@@ -32,8 +30,6 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
       setTotalColetado(total.total);
       setTotalColetadoOffState(total.totalOff);
     }
-
-
     navigation.setOptions({
       headerRight: () => (
         <View>
@@ -52,16 +48,6 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
         })
       );
     }
-
-    /*navigation.setOptions({
-      headerLeft: () => (
-        <Button
-          transparent
-          onPress={() => navigation.goBack()}>
-          <FontAwesomeIcon icon="arrow-left" color="white" size={25} style={{ marginLeft: 10 }} />
-        </Button>
-      ),
-    });*/
     navigation.setOptions({
       headerLeft: () => (
         <Button
@@ -71,19 +57,18 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
         </Button>
       ),
     });
-
+    var coletaCopy = coleta;
     async function buscarTanques() {
-      ;
       //coleta iniciada
       await AsyncStorage.setItem('@emAberto', 'true');
       //iniciando redux de coleta
       const realm = await getRealm();
-      var coletaCopy = coleta;
       const TanquesUnicos = realm
         .objects('Tanque')
         .filtered('LINHA == $0 and TRUEPREDICATE SORT(tanque ASC) DISTINCT(tanque)', cod_linha);
       TanquesUnicos.addListener((TanquesUnicos) => {
         if (TanquesUnicos.length > 0) {
+
           let TanquesUnicosState = [];
           TanquesUnicos.map((tanqueUnicoPreencher) => {
             tanque = {
@@ -130,9 +115,11 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
                 })
                 TanquesUnicosState[TanquesUnicos.indexOf(tanqueUnico)].lataoList = lataoArray;
               })
+              console.log(coletaCopy.length);
               coletaCopy.map((coletaItem) => {
                 if (coletaItem.id == cod_linha) {
-                  coletaItem.coleta = TanquesUnicosState
+                  coletaItem.coleta = TanquesUnicosState;
+                  console.log(coletaCopy);
                 }
               })
               save_coleta(coletaCopy);
@@ -142,7 +129,8 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
         }
       });
     }
-    coleta.map((coletaItem) => {
+
+    coletaCopy.map((coletaItem) => {
       if (coletaItem.id == cod_linha) {
         if (coletaItem.coleta.length <= 0) {
           buscarTanques();
@@ -239,21 +227,9 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
     )
   }
 
-  /*
-  <Text style={styles.textCod}>
-              {tanque.tanque}
-            </Text>
-            <Text style={styles.textNome}>
-              {tanque.lataoList.length}/{cont}
-            </Text>
-            <Text style={styles.textNome}>
-              {tanque.volume}
-            </Text>
-            */
-
   return (
     <View>
-      {coleta[id_linha].coleta.length > 0 ?
+      {coleta.length > 0 && coleta[id_linha].coleta.length > 0 ?
         (
           <View>
             <View style={styles.viewMainFlatList}>

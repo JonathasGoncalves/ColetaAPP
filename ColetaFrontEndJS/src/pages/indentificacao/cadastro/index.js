@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Image, Alert, ActivityIndicator } from 'react-native';
+import {
+  View, Text, TextInput, Image, Alert,
+  ActivityIndicator, KeyboardAvoidingView,
+  TouchableWithoutFeedback, Keyboard,
+  Platform
+} from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import styles from './style';
-import { Button } from 'native-base';
+import { Button, Container } from 'native-base';
 import api from '../../../services/api';
 import * as actionsIMEI from '../../../store/actions/imeiActions';
 import { getUniqueId } from 'react-native-device-info';
@@ -12,9 +17,11 @@ import linha from '../../linha';
 import getRealm from '../../../services/realm';
 import Realm from 'realm';
 import * as actionsColeta from '../../../store/actions/coletaActions';
+import { time, date } from '../../../functions/tempo';
 
-const Cadastro = ({ saveVeiculo, save_placa, save_coleta, save_linhas }) => {
+const Cadastro = ({ adicionar_horaI, adicionar_data, saveVeiculo, save_linhas }) => {
   const [placa, setPlaca] = useState('');
+  const [odometro, setOdometro] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function salvarPlaca() {
@@ -28,12 +35,10 @@ const Cadastro = ({ saveVeiculo, save_placa, save_coleta, save_linhas }) => {
         })
 
         try {
-          console.log(response.data.motorista);
+
           await AsyncStorage.setItem('@veiculo', JSON.stringify(response.data.motorista));
 
           const tempVeiculo = await AsyncStorage.getItem('@veiculo');
-          console.log(tempVeiculo);
-          //console.log(response.data.motorista);
 
           const responseLinhas = await api.post('api/linha/linhasPorVeiculo', {
             veiculo: response.data.motorista.VEICULO
@@ -46,6 +51,7 @@ const Cadastro = ({ saveVeiculo, save_placa, save_coleta, save_linhas }) => {
             linhas: linhas
           });
           save_linhas(linhas);
+          await AsyncStorage.setItem('@OdometroI', odometro);
           await AsyncStorage.setItem('@linhas', JSON.stringify(linhas));
           //gerando array de array para as possiveis coletas de cada linha
           //o indice do array é o codigo da linha
@@ -75,10 +81,18 @@ const Cadastro = ({ saveVeiculo, save_placa, save_coleta, save_linhas }) => {
               realm.create('Tanque', tanqueUnidade);
             });
           }
+
+          const hora = time();
+          const data = date();
+
+          adicionar_horaI(hora);
+          adicionar_data(data);
+          await AsyncStorage.setItem('@horaI', hora);
+          await AsyncStorage.setItem('@data', data);
+          await AsyncStorage.setItem('@emAberto', 'true');
           saveVeiculo(response.data.motorista);
 
         } catch (error) {
-          console.log(error);
           Alert.alert(
             'Erro',
             JSON.stringify(error),
@@ -103,36 +117,69 @@ const Cadastro = ({ saveVeiculo, save_placa, save_coleta, save_linhas }) => {
     setLoading(false);
   }
 
+  function setOdometroAction(text) {
+    newText = text.replace(/[^0-9]/g, '');
+    setOdometro(newText);
+  }
+
   return (
 
 
-    <View style={{ backgroundColor: 'white' }}>
-
-      <Image style={{ alignSelf: 'center' }} source={require('../../coleta/imagens/iconeCaminhao.jpg')} />
-      <Text allowFontScaling={false} style={styles.textDescPlaca}>
-        Este é seu primeiro acesso no nosso aplicativo de coleta de leite!
-        O primeiro passo antes de poder utilizar o APP é inserir a placa do veículo.
-        Por favor digite a placa do seu veiculo no campo abaixo
-      </Text>
-      <TextInput
-        editable={!loading}
-        style={styles.inputPlaca}
-        value={placa}
-        onChangeText={text => setPlaca(text)}
-      />
-      <Button
-        block
-        style={loading || placa.length <= 0 ? styles.buttonContinuarPress : styles.buttonContinuar}
-        rounded={true}
-        onPress={salvarPlaca}
-        disabled={loading || placa.length <= 0}
+    <Container style={{ backgroundColor: 'white', flex: 1 }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
       >
-        <Text allowFontScaling={false} style={styles.textButtonContinuar}>Continuar</Text>
-      </Button>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={{
+            padding: 24,
+            flex: 1,
+            justifyContent: "space-around"
+          }}>
+            <View >
+              <View>
+                <Image style={{ alignSelf: 'center' }} source={require('../../coleta/imagens/iconeCaminhao.jpg')} />
+                <Text allowFontScaling={false} style={styles.textDescPlaca}>
+                  Por favor digite a placa do seu veiculo no campo abaixo
+              </Text>
+                <TextInput
+                  editable={!loading}
+                  style={styles.inputPlaca}
+                  value={placa}
+                  onChangeText={text => setPlaca(text)}
+                />
 
-      {loading && <ActivityIndicator size='large' color='green' style={{ marginTop: 20 }} />}
+              </View>
 
-    </View>
+              <View>
+                <Text allowFontScaling={false} style={styles.textDescPlaca}>
+                  Odômetro Inicial
+              </Text>
+                <TextInput
+                  editable={!loading}
+                  style={styles.inputPlaca}
+                  value={odometro}
+                  onChangeText={text => setOdometroAction(text)}
+                />
+                <Button
+                  block
+                  style={loading || placa.length <= 0 ? styles.buttonContinuarPress : styles.buttonContinuar}
+                  rounded={true}
+                  onPress={salvarPlaca}
+                  disabled={loading || placa.length <= 0}
+                >
+                  <Text allowFontScaling={false} style={styles.textButtonContinuar}>Continuar</Text>
+                </Button>
+              </View>
+            </View>
+
+
+
+            {loading && <ActivityIndicator size='large' color='green' style={{ marginTop: 20 }} />}
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </Container >
   );
 }
 

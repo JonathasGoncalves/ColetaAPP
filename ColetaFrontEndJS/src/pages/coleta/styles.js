@@ -181,6 +181,19 @@ const styles = StyleSheet.create({
     marginTop: 20,
     bottom: 50
   },
+  textDescOdometro: {
+    fontSize: 20,
+    color: 'black',
+    alignSelf: 'center',
+    fontWeight: "bold",
+    //marginRight: 10,
+    // marginLeft: 10,
+    //marginBottom: 10,
+    padding: 10,
+    textAlign: "center",
+    marginTop: 20,
+    width: (Dimensions.get("window").width) * 0.8,
+  },
   ViewColetaInfo: {
     flexDirection: 'row',
     borderColor: 'black',

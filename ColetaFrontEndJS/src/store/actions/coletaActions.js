@@ -2,7 +2,6 @@ export function save_linha(cod_linha) {
   return {
     type: 'SAVE_LINHA',
     cod_linha,
-    emAberto: true
   };
 }
 
@@ -31,13 +30,6 @@ export function save_linhas(linhas) {
   return {
     type: 'SAVE_LINHAS',
     linhas,
-  };
-}
-
-export function finalizar_coleta() {
-  return {
-    type: 'FINALIZAR_COLETA',
-    emAberto: false
   };
 }
 

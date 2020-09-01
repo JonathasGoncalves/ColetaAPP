@@ -34,7 +34,6 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
   const [totalColetadoOffState, setTotalColetadoOffState] = useState(0);
 
   useEffect(() => {
-    console.log(coleta[0].coleta[0]);
     total = calcularTotalColetado(coleta);
     setTotalColetado(total.total);
     setTotalColetadoOffState(total.totalOff)
@@ -136,8 +135,6 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
   }
 
   function coletarLatao(latao) {
-    /*console.log('latao');
-    console.log(coleta[0].coleta[0]);*/
     setVolume(latao.volume);
     setLatao(latao.latao);
     setColetando(true);
@@ -187,8 +184,6 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
     var copyColeta = coleta;
     var contColeta = 0;
     var tanqueTemp = {};
-
-    console.log(copyColeta[id_linha]);
     copyColeta[id_linha].coleta.map((tanqueMap) => {
       if (tanqueMap.tanque == tanqueAtual.tanque) {
         //tanqueTemp = tanqueMap;
@@ -202,7 +197,6 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
             listLatao.volume = parseInt(volume);
           }
         })
-        console.log(parseInt(volume));
         tanqueMap.volume = parseInt(volume);
         tanqueMap.cod_ocorrencia = obsType;
         tanqueMap.observacao = obs;
@@ -211,7 +205,6 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
         tanqueTemp = tanqueMap;
       }
     })
-    console.log(copyColeta[id_linha]);
     total = calcularTotalColetado(coleta);
     setTotalColetado(total.total);
     setTotalColetadoOffState(total.totalOff)
@@ -249,21 +242,14 @@ const LataoColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, s
         { text: 'Não' },
       ]
     );
-
-
   }
 
   async function limparColeta(indexTanque, index) {
 
     setLoading(true);
     var copyColeta = coleta;
-    console.log(index);
-    console.log(indexTanque);
     temp = parseInt(copyColeta[id_linha].coleta[indexTanque].volume);
     temp2 = parseInt(copyColeta[id_linha].coleta[indexTanque].lataoList[index].volume);
-    console.log('temp - temp2');
-    console.log(temp);
-    console.log(copyColeta[id_linha].coleta[indexTanque]);
     copyColeta[id_linha].coleta[indexTanque].volume = temp - temp2;
     //copyColeta[id_linha].coleta[indexTanque].volume = copyColeta[id_linha].coleta[indexTanque].volume - copyColeta[id_linha].coleta[indexTanque].lataoList[index].volume_fora_padrao;
     copyColeta[id_linha].coleta[indexTanque].lataoList[index].hora = '';

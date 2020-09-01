@@ -37,16 +37,16 @@ const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar
   */
   useEffect(() => {
     //buscar linhas da base local
-    function pupularColeta() {
+    async function pupularColeta() {
       coletaTemp = [];
       linhas.map((linha) => {
-        console.log(linha);
         coletaTemp.push({
           id: linha,
           coleta: []
         });
       })
       save_coleta(coletaTemp);
+      await AsyncStorage.setItem('@coleta', JSON.stringify(coletaTemp));
     }
 
     async function buscarLinhas() {
@@ -102,18 +102,19 @@ const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar
       }
     })
 
-    const hora = time();
+    /*const hora = time();
     const data = date();
-    console.log('@linha');
-    console.log(cod_linha);
-    await AsyncStorage.setItem('@linha', cod_linha);
-    save_linha(cod_linha);
+
+   
     adicionar_horaI(hora);
     await AsyncStorage.setItem('@horaI', hora);
     await AsyncStorage.setItem('@data', data);
-    adicionar_data(data);
+    await AsyncStorage.setItem('@emAberto', 'true');
+    adicionar_data(data);*/
     //await AsyncStorage.setItem('@finalizado', '1');
     //transmitir_coleta('1');
+    await AsyncStorage.setItem('@linha', cod_linha);
+    save_linha(cod_linha);
     navigation.navigate('Coleta');
   }
 

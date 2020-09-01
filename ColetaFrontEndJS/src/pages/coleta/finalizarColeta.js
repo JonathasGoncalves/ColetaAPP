@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, Alert } from 'react-native';
+import {
+  View, Text, ActivityIndicator, Alert, TextInput,
+  KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard,
+  FlatList
+}
+  from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actionsColeta from '../../store/actions/coletaActions';
 import styles from './styles';
-import { Button } from 'native-base';
+import { Button, Container } from 'native-base';
 import getRealm from '../../services/realm';
 import api from '../../services/api';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -13,17 +18,21 @@ import { CommonActions } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import * as actionsIMEI from '../../store/actions/imeiActions';
 
-const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, finalizar_coleta, navigation, save_coleta, cod_linha, placa, transmitir_coleta, adicionar_horaF, imei }) => {
+const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, navigation, save_coleta, cod_linha, placa, transmitir_coleta, adicionar_horaF, imei }) => {
 
   const [loading, setLoading] = useState(false);
+  const [odometro, setOdometro] = useState('');
   const [transmitindo, setTransmitindo] = useState(false);
   const [tanques, setTanques] = useState(0);
   const [volume, setVolume] = useState(0);
   const [tanquesOc, setTanquesOc] = useState(0);
   const [volumeOc, setVolumeOc] = useState(0);
+  const [grid, setGrid] = useState([]);
 
   //@finalizado 1 coleta; 2 falta finalizar; 3 falta transmitir
   useEffect(() => {
+
+
 
     navigation.setOptions({
       headerLeft: () => (
@@ -51,6 +60,11 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, f
 
     verificarSubmisao();
   }, [])
+
+  function setOdometroAction(text) {
+    newText = text.replace(/[^0-9]/g, '');
+    setOdometro(newText);
+  }
 
   async function finalizarColeta() {
     setLoading(true);
@@ -123,7 +137,42 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, f
         })
       })
     })
+
+    listGrid = [];
+    labels = ['Data', 'Nº Tanques', 'Volume', 'Tanq. Ocorrências', 'Vol. Fora Padrão', 'Hora Ínicio', 'Hora Fim'];
+    values = [data, tanques, volume, tanquesOc, volumeOc, horaI, horaF]
+    obj = {
+      label: '',
+      valor: '',
+      id: 0
+    }
+    for (i = 0; i < 7; i++) {
+      obj.label = labels[i];
+      obj.valor = values[i];
+      obj.id = i;
+      listGrid[i] = obj;
+    }
+    setGrid(listGrid);
     setLoading(false);
+  }
+
+  function renderTotal(total) {
+    return (
+      <View style={{ flexDirection: 'row', borderBottomWidth: 1 }}>
+        <TouchableOpacity onPress={() => (coletarLatao(latao))}>
+          <View style={styles.viewItemLinha}>
+            <View style={styles.viewItemLatao}>
+              <Text allowFontScaling={false} style={styles.textTitulo}>
+                {total.label}
+              </Text>
+              <Text allowFontScaling={false} style={styles.textCod}>
+                {total.valor}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>
+    )
   }
 
   async function submeterColeta() {
@@ -131,6 +180,8 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, f
     //criar array no formato que a api recebe
     setTransmitindo(true);
     setLoading(true);
+
+    await AsyncStorage.setItem('@OdometroI', odometro);
 
     try {
       var mes = '';
@@ -144,12 +195,18 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, f
 
       const veiculoTemp = await AsyncStorage.getItem('@veiculo');
       const veiculo = JSON.parse(veiculoTemp);
-      console.log(veiculoTemp);
+
+      const data = await AsyncStorage.getItem('@data');
 
       const responseColeta = await api.post('api/coleta/NovaColeta', {
-        cod_transportadora: veiculo.COD_TRANSPORTADORA,
-        data: dataHJ
+        data: data,
+        transportador: veiculo.COD_TRANSPORTADORA,
+        motorista: veiculo.COD_MOTORISTA,
+        veiculo: veiculo.VEICULO
       })
+
+
+
 
       var coletaRequest = [];
       coleta.map((coleta) => {
@@ -189,6 +246,7 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, f
         })
       })
 
+
       try {
         const responseTanques = await api.post('api/coleta/NovaColetaItem', {
           coletas: coletaRequest
@@ -199,10 +257,8 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, f
         realm.write(() => {
           realm.delete(allColetas)
         })
-        removerID();
         await AsyncStorage.multiRemove(['@emAberto', '@coleta', '@linha', '@finalizado', '@veiculo']);
         const emAbertoStorage = await AsyncStorage.getItem('@emAberto');
-
         await AsyncStorage.setItem('@transmitir', 'false');
       } catch (error) {
         console.log(error);
@@ -215,24 +271,16 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, f
       'Sucesso!',
       'Coleta transmitida!',
       [
-        { text: 'ok' },
+        { text: 'ok', onPress: () => sair() },
       ]
     );
+  }
 
-    finalizar_coleta();
-    //await updateTanques();
+  function sair() {
+    save_coleta([]);
     setTransmitindo(false);
     setLoading(false);
-    save_coleta([]);
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 1,
-        routes: [
-          { name: 'Coletar' },
-        ],
-      })
-    );
-
+    removerID();
   }
 
   async function updateTanques() {
@@ -268,56 +316,69 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, f
   }
 
   return (
-    <View>
-      {loading ? (
-        <ActivityIndicator size="large" color="green" />
-      ) : (
-          <View style={styles.ViewButton}>
-            <View>
-              <Text allowFontScaling={false} style={styles.textTituloGeral}>Informações Gerais</Text>
-              <View style={styles.ViewColetaInfo}>
-                <View>
-                  <Text allowFontScaling={false} style={styles.itemColetaInfo}>Data</Text>
-                  <Text allowFontScaling={false} style={styles.itemColetaInfo}>Nº Tanques</Text>
-                  <Text allowFontScaling={false} style={styles.itemColetaInfo}>Volume</Text>
-                  <Text allowFontScaling={false} style={styles.itemColetaInfo}>Tanq. Ocorrências</Text>
-                  <Text allowFontScaling={false} style={styles.itemColetaInfo}>Vol. Fora Padrão</Text>
-                  <Text allowFontScaling={false} style={styles.itemColetaInfo}>Hora Ínicio</Text>
-                  <Text allowFontScaling={false} style={styles.itemColetaInfoLast}>Hora Fim</Text>
+    <Container>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={{
+            padding: 24,
+            flex: 1,
+            justifyContent: "space-around"
+          }}>
+            {loading || transmitindo ? (
+              <ActivityIndicator size="large" color="green" />
+            ) : (
+
+                <View style={styles.ViewButton}>
+                  <View>
+                    <Text allowFontScaling={false} style={styles.textTituloGeral}>Informações Gerais</Text>
+                    <FlatList
+                      data={grid}
+                      keyExtractor={item => item.id}
+                      renderItem={({ item }) => renderTotal(item)}
+                    />
+                  </View>
+
+                  <View style={{ marginTop: 20 }}>
+                    <Text allowFontScaling={false} style={styles.textDescOdometro}>
+                      Odômetro Final
+                    </Text>
+                    <TextInput
+                      maxLength={9}
+                      keyboardType='numeric'
+                      editable={!loading}
+                      style={styles.inputPlaca}
+                      value={odometro}
+                      onChangeText={text => setOdometroAction(text)}
+                    />
+                  </View>
+
+                  <Button
+                    block
+                    style={loading || transmitindo || odometro.length <= 0 ? styles.buttonContinuarPress : styles.buttonContinuar}
+                    disabled={loading || odometro.length <= 0 || transmitindo}
+                    rounded={true}
+                    onPress={submeterColeta}
+                  >
+                    <Text allowFontScaling={false} style={styles.textButtonContinuar}>Transmitir Coleta</Text>
+                  </Button>
                 </View>
-                <View>
-                  <Text allowFontScaling={false} style={styles.itemColetaResp}>{data}</Text>
-                  <Text allowFontScaling={false} style={styles.itemColetaResp}>{tanques}</Text>
-                  <Text allowFontScaling={false} style={styles.itemColetaResp}>{volume} lts</Text>
-                  <Text allowFontScaling={false} style={styles.itemColetaResp}>{tanquesOc}</Text>
-                  <Text allowFontScaling={false} style={styles.itemColetaResp}>{volumeOc} lts</Text>
-                  <Text allowFontScaling={false} style={styles.itemColetaResp}>{horaI}</Text>
-                  <Text allowFontScaling={false} style={styles.itemColetaRespLast}>{horaF}</Text>
-                </View>
-              </View>
-            </View>
-            <Button
-              block
-              style={loading || transmitindo ? styles.buttonContinuarPress : styles.buttonContinuar}
-              disabled={transmitindo}
-              rounded={true}
-              onPress={submeterColeta}
-            >
-              <Text allowFontScaling={false} style={styles.textButtonContinuar}>Transmitir Coleta</Text>
-            </Button>
+              )
+            }
           </View>
-        )
-      }
-    </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </Container>
   )
 }
 
 const mapStateToProps = state => ({
   tanqueAtual: state.Coleta.tanqueAtual,
   coleta: state.Coleta.coleta,
-  emAberto: state.Coleta.emAberto,
   cod_linha: state.Coleta.cod_linha,
-  placa: state.Identificacao.placa,
+  veiculo: state.Identificacao.veiculo,
   transmitir: state.Coleta.transmitir,
   horaI: state.Coleta.horaI,
   horaF: state.Coleta.horaF,

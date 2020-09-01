@@ -37,12 +37,9 @@ const styles = StyleSheet.create({
     color: 'black',
     alignSelf: 'center',
     fontWeight: "bold",
-    //marginRight: 10,
-    // marginLeft: 10,
-    //marginBottom: 10,
-    padding: 10,
-    textAlign: "center",
-    marginTop: 20
+    ///padding: 10,
+    //textAlign: "center",
+    //marginTop: 20
   },
   textButtonContinuar: {
     fontSize: 20,
