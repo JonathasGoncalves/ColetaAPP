@@ -19,12 +19,13 @@ import Realm from 'realm';
 import * as actionsColeta from '../../../store/actions/coletaActions';
 import { time, date } from '../../../functions/tempo';
 
-const Cadastro = ({ adicionar_horaI, adicionar_data, saveVeiculo, save_linhas }) => {
+const Cadastro = ({ save_coleta, adicionar_horaI, adicionar_data, saveVeiculo, save_linhas }) => {
   const [placa, setPlaca] = useState('');
   const [odometro, setOdometro] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function salvarPlaca() {
+
     setLoading(true);
 
     const imeiLocal = getUniqueId();
@@ -90,6 +91,7 @@ const Cadastro = ({ adicionar_horaI, adicionar_data, saveVeiculo, save_linhas })
           await AsyncStorage.setItem('@horaI', hora);
           await AsyncStorage.setItem('@data', data);
           await AsyncStorage.setItem('@emAberto', 'true');
+          save_coleta([]);
           saveVeiculo(response.data.motorista);
 
         } catch (error) {
@@ -163,10 +165,10 @@ const Cadastro = ({ adicionar_horaI, adicionar_data, saveVeiculo, save_linhas })
                 />
                 <Button
                   block
-                  style={loading || placa.length <= 0 ? styles.buttonContinuarPress : styles.buttonContinuar}
+                  style={loading || placa.length <= 0 || odometro.length <= 0 ? styles.buttonContinuarPress : styles.buttonContinuar}
                   rounded={true}
                   onPress={salvarPlaca}
-                  disabled={loading || placa.length <= 0}
+                  disabled={loading || placa.length <= 0 || odometro.length <= 0}
                 >
                   <Text allowFontScaling={false} style={styles.textButtonContinuar}>Continuar</Text>
                 </Button>

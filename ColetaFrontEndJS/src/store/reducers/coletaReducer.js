@@ -2,6 +2,7 @@ const INITIAL_STATE = {
   cod_linha: '',
   coleta: [], //array de array (cada posição representa os tanques da linha)
   tanqueAtual: {},
+  lataoAtual: {},
   emAberto: false, //false não começou a coleta (Não escolheu a linha), true ecolheu a linha 
   transmitir: '0', //0 tela de linha, 1 tela de coleta, 2 tela de finalizar, 3 tela de transmitir
   id_coleta: 0,
@@ -41,6 +42,12 @@ export default function Coleta(state = INITIAL_STATE, action) {
         ...state,
         tanqueAtual: action.tanqueAtual
       }
+    case 'SAVE_LATAO':
+      return {
+        ...state,
+        lataoAtual: action.lataoAtual
+      }
+
     case 'SAVE_LINHAS':
       return {
         ...state,

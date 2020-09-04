@@ -17,6 +17,7 @@ import { time } from '../../functions/tempo';
 import { CommonActions } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import * as actionsIMEI from '../../store/actions/imeiActions';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, navigation, save_coleta, cod_linha, placa, transmitir_coleta, adicionar_horaF, imei }) => {
 
@@ -31,9 +32,6 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
 
   //@finalizado 1 coleta; 2 falta finalizar; 3 falta transmitir
   useEffect(() => {
-
-
-
     navigation.setOptions({
       headerLeft: () => (
         <Button
@@ -43,7 +41,6 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
         </Button>
       ),
     });
-
     navigation.setOptions({
       headerRight: () => (
         <View>
@@ -52,6 +49,9 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
     });
 
     async function verificarSubmisao() {
+      const veiculoTemp = await AsyncStorage.getItem('@veiculo');
+      console.log('veiculoTemp');
+      console.log(veiculoTemp);
       const hora = time();
       adicionar_horaF(hora);
       await AsyncStorage.setItem('@horaF', hora);
@@ -89,10 +89,8 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
           tanquesCount++;
           volumeSum += coletaItem.volume;
         }
-
       })
     })
-
 
     setTanques(tanquesCount);
     setTanquesOc(tanquesCountOc);
@@ -107,7 +105,6 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
             if (coletaItem.cod_ocorrencia != '') {
               volumeOC = coletaItem.volume;
             }
-
             coletaUnidade = {
               id: coletaItem.id,
               codigo: coletaItem.codigo,
@@ -138,19 +135,25 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
       })
     })
 
-    listGrid = [];
+    const horafAdd = await AsyncStorage.getItem('@horaF');
     labels = ['Data', 'Nº Tanques', 'Volume', 'Tanq. Ocorrências', 'Vol. Fora Padrão', 'Hora Ínicio', 'Hora Fim'];
-    values = [data, tanques, volume, tanquesOc, volumeOc, horaI, horaF]
+    values = [data, tanquesCount, volumeSum, tanquesCountOc, volumeSumOc, horaI, horafAdd]
     obj = {
       label: '',
       valor: '',
-      id: 0
+      id: '0'
     }
+    listGrid = [];
     for (i = 0; i < 7; i++) {
       obj.label = labels[i];
       obj.valor = values[i];
-      obj.id = i;
-      listGrid[i] = obj;
+      obj.id = String(i);
+      listGrid.push(obj);
+      obj = {
+        label: '',
+        valor: '',
+        id: '0'
+      }
     }
     setGrid(listGrid);
     setLoading(false);
@@ -158,19 +161,17 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
 
   function renderTotal(total) {
     return (
-      <View style={{ flexDirection: 'row', borderBottomWidth: 1 }}>
-        <TouchableOpacity onPress={() => (coletarLatao(latao))}>
-          <View style={styles.viewItemLinha}>
-            <View style={styles.viewItemLatao}>
-              <Text allowFontScaling={false} style={styles.textTitulo}>
-                {total.label}
-              </Text>
-              <Text allowFontScaling={false} style={styles.textCod}>
-                {total.valor}
-              </Text>
-            </View>
+      <View style={total.id == '0' ? styles.ViewItemList1 : styles.ViewItemList}>
+        <View style={styles.viewItemLinhaFinalizar}>
+          <View style={styles.viewItemLatao}>
+            <Text allowFontScaling={false} style={styles.textTituloFinalizar}>
+              {total.label}
+            </Text>
+            <Text allowFontScaling={false} style={styles.textvalorFinal}>
+              {total.valor}
+            </Text>
           </View>
-        </TouchableOpacity>
+        </View>
       </View>
     )
   }
@@ -181,7 +182,7 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
     setTransmitindo(true);
     setLoading(true);
 
-    await AsyncStorage.setItem('@OdometroI', odometro);
+    await AsyncStorage.setItem('@OdometroF', odometro);
 
     try {
       var mes = '';
@@ -197,27 +198,28 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
       const veiculo = JSON.parse(veiculoTemp);
 
       const data = await AsyncStorage.getItem('@data');
+      const odometroI = await AsyncStorage.getItem('@OdometroI');
+      const odometroF = await AsyncStorage.getItem('@OdometroF');
 
       const responseColeta = await api.post('api/coleta/NovaColeta', {
         data: data,
         transportador: veiculo.COD_TRANSPORTADORA,
         motorista: veiculo.COD_MOTORISTA,
-        veiculo: veiculo.VEICULO
+        veiculo: veiculo.VEICULO,
+        odometroI: odometroI,
+        odometroF: odometroF
       })
-
-
-
 
       var coletaRequest = [];
       coleta.map((coleta) => {
         coleta.coleta.map((coletaItem) => {
           coletaItem.lataoList.map((latao) => {
-            if (coletaItem.volume > 0 || coletaItem.cod_ocorrencia != '') {
-              volumeOC = 0;
+            if (coletaItem.volume > 0 && coletaItem.cod_ocorrencia == '') {
+
+              /*volumeOC = 0;
               if (coletaItem.cod_ocorrencia != '') {
                 volumeOC = coletaItem.volume;
-              }
-
+              }*/
               coletaUnidade = {
                 id_coleta: responseColeta.data.id,
                 id: coletaItem.id,
@@ -228,7 +230,7 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
                 LINHA: coletaItem.LINHA,
                 lataoQuant: parseInt(coletaItem.lataoQuant),
                 ATUALIZAR_COORDENADA: coletaItem.ATUALIZAR_COORDENADA,
-                temperatura: coletaItem.temperatura,
+                temperatura: parseFloat(coletaItem.temperatura),
                 odometro: coletaItem.odometro,
                 volume: latao.volume,
                 latitude: coletaItem.latitude,
@@ -238,11 +240,40 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
                 data: latao.data,
                 hora: latao.hora,
                 boca: 1,
-                volume_fora_padrao: volumeOC
+                volume_fora_padrao: 0
               };
               coletaRequest.push(coletaUnidade);
             }
           })
+          if (coletaItem.cod_ocorrencia != '') {
+            volumeOC = 0;
+            volumeOC = coletaItem.volume;
+
+            coletaUnidade = {
+              id_coleta: responseColeta.data.id,
+              id: coletaItem.id,
+              codigo: coletaItem.codigo,
+              codigo_cacal: coletaItem.codigo_cacal,
+              tanque: coletaItem.tanque,
+              latao: coletaItem.latao,
+              LINHA: coletaItem.LINHA,
+              lataoQuant: parseInt(coletaItem.lataoQuant),
+              ATUALIZAR_COORDENADA: coletaItem.ATUALIZAR_COORDENADA,
+              temperatura: parseFloat(coletaItem.temperatura),
+              odometro: coletaItem.odometro,
+              volume: 0,
+              latitude: coletaItem.latitude,
+              longitude: coletaItem.longitude,
+              cod_ocorrencia: coletaItem.cod_ocorrencia,
+              observacao: coletaItem.observacao,
+              data: coletaItem.lataoList[0].data,
+              hora: coletaItem.lataoList[0].hora,
+              boca: 1,
+              volume_fora_padrao: volumeOC
+            };
+            coletaRequest.push(coletaUnidade);
+
+          }
         })
       })
 
@@ -317,23 +348,26 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
 
   return (
     <Container>
+
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView>
           <View style={{
             padding: 24,
             flex: 1,
             justifyContent: "space-around"
           }}>
+
+
             {loading || transmitindo ? (
               <ActivityIndicator size="large" color="green" />
             ) : (
 
-                <View style={styles.ViewButton}>
-                  <View>
-                    <Text allowFontScaling={false} style={styles.textTituloGeral}>Informações Gerais</Text>
+                <View style={styles.ViewTotalFinalizar}>
+                  <View style={styles.ViewFlatList}>
+                    <Text allowFontScaling={false} style={styles.textTituloGeralFinalizar}>Informações Gerais</Text>
                     <FlatList
                       data={grid}
                       keyExtractor={item => item.id}
@@ -368,8 +402,9 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
               )
             }
           </View>
-        </TouchableWithoutFeedback>
+        </ScrollView>
       </KeyboardAvoidingView>
+
     </Container>
   )
 }

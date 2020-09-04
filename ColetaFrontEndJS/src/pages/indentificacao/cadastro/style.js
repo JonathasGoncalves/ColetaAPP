@@ -55,7 +55,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginLeft: 10,
     marginRight: 10,
-    fontSize: 16
+    fontSize: 16,
+    textAlign: 'center'
   },
   viewItemTransp: {
     //flex: 1,

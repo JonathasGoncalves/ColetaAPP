@@ -12,11 +12,15 @@ import getRealm from '../../services/realm';
 import TanqueSchema from '../../schemas/TanqueRepository';
 import AsyncStorage from '@react-native-community/async-storage';
 import { time, date } from '../../functions/tempo';
+import calcularTotalColetado from '../../functions/totalColeta';
 
 const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar_data, adicionar_horaI, save_coleta }) => {
   const [linhasRender, setLinhas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [path, setPath] = React.useState('');
+  const [totalColetadoState, setTotalColetado] = useState(0);
+  const [totalColetadoOffState, setTotalColetadoOffState] = useState(0);
+
   /*
   formato do objeto com todas as coletas. 
   Coleta guarda o array de tanque e valores coletados e id é o numero da linha
@@ -36,6 +40,11 @@ const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar
     ]
   */
   useEffect(() => {
+
+    total = calcularTotalColetado(coleta);
+    setTotalColetado(total.total);
+    setTotalColetadoOffState(total.totalOff);
+
     //buscar linhas da base local
     async function pupularColeta() {
       coletaTemp = [];
@@ -46,6 +55,7 @@ const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar
         });
       })
       save_coleta(coletaTemp);
+      console.log(coletaTemp);
       await AsyncStorage.setItem('@coleta', JSON.stringify(coletaTemp));
     }
 
@@ -69,8 +79,8 @@ const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar
     buscarLinhas();
 
     //executa somente uma vez
+    console.log('coleta.length ' + coleta.length);
     if (coleta.length == 0) {
-
       pupularColeta();
     }
 
@@ -138,13 +148,28 @@ const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar
     <View style={styles.viewMain}>
 
       {linhasRender.length > 0 ? (
-        < View style={styles.viewMain}>
-          <Text allowFontScaling={false} style={styles.textTitulo}>Selecione a linha</Text>
-          <FlatList
-            data={linhasRender}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => renderLinha(item)}
-          />
+        <View>
+
+          <View style={styles.viewMainFlatList}>
+            <Text allowFontScaling={false} style={styles.textTitulo}>Selecione a linha</Text>
+            <FlatList
+              data={linhasRender}
+              keyExtractor={item => item.id}
+              renderItem={({ item }) => renderLinha(item)}
+            />
+          </View>
+
+          <View style={{ flexDirection: 'row', flex: 1 }}>
+            <View style={styles.viewTotalColetado}>
+              <Text style={styles.textTotalColetado}>Total Coletado</Text>
+              <Text style={styles.ValueTotalColetado}>{totalColetadoState}</Text>
+            </View>
+            <View style={styles.viewTotalColetado}>
+              <Text style={styles.textTotalColetado}>Total Fora do Padrão</Text>
+              <Text style={styles.ValueTotalColetado}>{totalColetadoOffState}</Text>
+            </View>
+          </View>
+
         </View>
       ) : (
           <ActivityIndicator size="large" color="green" />

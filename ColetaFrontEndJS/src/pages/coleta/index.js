@@ -23,10 +23,10 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
   const [totalColetadoOffState, setTotalColetadoOffState] = useState(0);
 
   useEffect(() => {
+    //console.log(coleta[0]);
 
     if (coleta) {
       total = calcularTotalColetado(coleta);
-      console.log(total);
       setTotalColetado(total.total);
       setTotalColetadoOffState(total.totalOff);
     }
@@ -48,15 +48,17 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
         })
       );
     }
+
     navigation.setOptions({
       headerLeft: () => (
         <Button
           transparent
-          onPress={() => navigation.toggleDrawer()}>
-          <FontAwesomeIcon icon="bars" color="white" size={25} style={{ marginLeft: 10 }} />
+          onPress={() => navigation.goBack()}>
+          <FontAwesomeIcon icon="arrow-left" color="white" size={25} style={{ marginLeft: 10 }} />
         </Button>
       ),
     });
+
     var coletaCopy = coleta;
     async function buscarTanques() {
       //coleta iniciada
@@ -83,7 +85,7 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
               lataoQuant: tanqueUnicoPreencher.lataoQuant,
               ATUALIZAR_COORDENADA: tanqueUnicoPreencher.ATUALIZAR_COORDENADA,
               lataoList: [],
-              temperatura: 0,
+              temperatura: '',
               odometro: '',
               volume: 0,
               volume_fora_padrao: 0,
@@ -115,11 +117,9 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
                 })
                 TanquesUnicosState[TanquesUnicos.indexOf(tanqueUnico)].lataoList = lataoArray;
               })
-              console.log(coletaCopy.length);
               coletaCopy.map((coletaItem) => {
                 if (coletaItem.id == cod_linha) {
                   coletaItem.coleta = TanquesUnicosState;
-                  console.log(coletaCopy);
                 }
               })
               save_coleta(coletaCopy);
@@ -130,13 +130,17 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
       });
     }
 
+    //console.log(coletaCopy.length);
     coletaCopy.map((coletaItem) => {
       if (coletaItem.id == cod_linha) {
         if (coletaItem.coleta.length <= 0) {
+          //console.log('coletaItem.coleta.length');
           buscarTanques();
         }
       }
     })
+
+
 
   }, [])
 
@@ -144,7 +148,7 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
     //alterar list para os latões
     save_tanque(tanque);
     AsyncStorage.setItem('@tanqueAtual', JSON.stringify(tanque));
-    navigation.navigate('Latao');
+    navigation.navigate('Tanque');
   }
   //renderiza item da lista
   function renderTanque(tanque) {
@@ -155,6 +159,17 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
         cont++;
       }
     })
+
+    function somar() {
+      let somaTeste = 0;
+      tanque.lataoList.map((latao) => {
+        if (latao.volume > 0) {
+          somaTeste += latao.volume;
+        }
+      })
+      return somaTeste;
+    }
+
 
     function confirmarExclusao(tanque) {
       const index = coleta[id_linha].coleta.indexOf(tanque)
@@ -179,7 +194,7 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
       copyColeta[id_linha].coleta[index].odometro = '';
       copyColeta[id_linha].coleta[index].volume = 0;
       copyColeta[id_linha].coleta[index].volume_fora_padrao = 0;
-      copyColeta[id_linha].coleta[index].temperatura = 0;
+      copyColeta[id_linha].coleta[index].temperatura = '';
       copyColeta[id_linha].coleta[index].latitude = '';
       copyColeta[id_linha].coleta[index].longitude = '';
       copyColeta[id_linha].coleta[index].cod_ocorrencia = '';
@@ -200,8 +215,8 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
 
     return (
       <View style={{ flexDirection: 'row', borderBottomWidth: 1 }}>
-        <TouchableOpacity onPress={() => coletarTanque(tanque)}>
-          <View style={styles.viewItemLinha}>
+        <TouchableOpacity style={{ flex: 1 }} onPress={() => coletarTanque(tanque)}>
+          <View style={styles.viewItemLinhaFlex}>
             <Text allowFontScaling={false} style={styles.textCod}>
               {tanque.tanque}
             </Text>
@@ -221,9 +236,7 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
             <FontAwesomeIcon icon="trash" color="black" size={25} style={{ marginLeft: 20 }} />
           </Button>
         }
-
-      </View >
-
+      </View>
     )
   }
 
@@ -232,6 +245,7 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
       {coleta.length > 0 && coleta[id_linha].coleta.length > 0 ?
         (
           <View>
+
             <View style={styles.viewMainFlatList}>
               <Text maxFontSizeMultiplier={1} style={styles.textTitulo}>{coleta[id_linha].coleta[0].descricao}</Text>
               <FlatList
@@ -250,8 +264,8 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
                 <Text style={styles.textTotalColetado}>Total Fora do Padrão</Text>
                 <Text style={styles.ValueTotalColetado}>{totalColetadoOffState}</Text>
               </View>
-
             </View>
+
           </View>
         ) : (
           <ActivityIndicator size="large" color="green" />

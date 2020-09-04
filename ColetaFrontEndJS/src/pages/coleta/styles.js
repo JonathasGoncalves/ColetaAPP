@@ -1,5 +1,6 @@
+
 import { StyleSheet } from 'react-native';
-import { Dimensions } from 'react-native'
+import { Dimensions } from 'react-native';
 
 const styles = StyleSheet.create({
   viewItemLinha: {
@@ -12,7 +13,17 @@ const styles = StyleSheet.create({
     marginTop: 2,
     minHeight: 70
   },
-
+  viewItemLinhaFlex: {
+    borderRadius: 5,
+    borderColor: 'gray',
+    flexDirection: 'row',
+    borderBottomWidth: 0,
+    alignItems: "center",
+    marginBottom: 2,
+    marginTop: 2,
+    minHeight: 70,
+    width: (Dimensions.get("window").width) * 0.8,
+  },
   viewItemLatao: {
     borderRadius: 5,
     borderColor: 'gray',
@@ -24,12 +35,33 @@ const styles = StyleSheet.create({
     minHeight: 70,
     marginLeft: 20
   },
+  textTituloFinalizar: {
+    flex: 1,
+    fontSize: 20,
+    color: 'black',
+    fontWeight: "bold",
+    padding: 10,
+    borderRightWidth: 1,
+  },
+  textvalorFinal: {
+    flex: 1,
+    fontSize: 18,
+    color: 'black',
+    marginLeft: 10,
+    alignSelf: 'center',
+  },
   textCod: {
     //flex: 1,
     fontSize: 18,
     color: 'black',
     marginLeft: 10,
     alignSelf: 'center'
+  },
+  ViewTotalFinalizar: {
+    width: (Dimensions.get("window").width) * 0.9,
+    //position: 'absolute'
+    //backgroundColor: 'red',
+    alignItems: 'center'
   },
   textLabel: {
     //flex: 1,
@@ -77,7 +109,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     //alignSelf: 'center',
     alignItems: 'center',
-    height: (Dimensions.get("window").height) * 0.2,
+    height: Dimensions.get("window").height * 0.2,
     width: Dimensions.get("window").width * 0.5,
   },
   textTitulo: {
@@ -91,6 +123,10 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlign: "center"
   },
+  ViewFlatList: {
+    width: Dimensions.get("window").width * 0.9,
+    marginTop: 20
+  },
   textTituloGeral: {
     fontSize: 20,
     color: 'black',
@@ -101,6 +137,37 @@ const styles = StyleSheet.create({
     //marginBottom: 10,
     marginTop: 20,
     textAlign: "center"
+  },
+  textTituloGeralFinalizar: {
+    fontSize: 20,
+    color: 'black',
+    alignSelf: 'center',
+    fontWeight: "bold",
+    //marginRight: 10,
+    // marginLeft: 10,
+    marginBottom: 10,
+    marginTop: 20,
+    textAlign: "center"
+  },
+  ViewItemList1: {
+    //flexDirection: 'row',
+    borderWidth: 1,
+  },
+  viewItemLinhaFinalizar: {
+    //borderRadius: 5,
+    //borderColor: 'gray',
+    //flexDirection: 'column',
+    borderBottomWidth: 0,
+    //alignItems: "center",
+    //marginBottom: 2,
+    //marginTop: 2,
+    minHeight: 70
+  },
+  ViewItemList: {
+    //flexDirection: 'row',
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1
   },
   textButtonContinuar: {
     fontSize: 20,
@@ -121,7 +188,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginLeft: 10,
     marginRight: 10,
-    fontSize: 16
+    fontSize: 16,
+    textAlign: 'center'
   },
   buttonContinuar: {
     width: 200,
@@ -272,3 +340,4 @@ const styles = StyleSheet.create({
 });
 
 export default styles;
+

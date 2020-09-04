@@ -41,8 +41,8 @@ Na balança, o usuario insere a placa e o protheus faz uma requisição das cole
 Ação ColetaPorPlaca
 
 Formato arquivo enviado:
-Data     Transportador   Motorista     Veiculo
-20200608 00468           0000019       000001
+Data      Transportador   Motorista     Veiculo
+20200608   00468           0000019       000001
 
 Arquivo coleta
 Linha  Produtor Tanque Latão  Quantidade  hora  Temp   boca 

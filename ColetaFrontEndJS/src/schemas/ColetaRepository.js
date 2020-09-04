@@ -11,7 +11,7 @@ export default class ColetaSchema {
       LINHA_DESC: 'string',
       lataoQuant: 'int',
       ATUALIZAR_COORDENADA: 'int',
-      temperatura: 'int',
+      temperatura: 'float',
       odometro: 'string',
       volume: 'int',
       latitude: 'string',

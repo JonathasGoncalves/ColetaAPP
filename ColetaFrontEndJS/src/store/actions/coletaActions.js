@@ -26,6 +26,14 @@ export function save_tanque(tanqueAtual) {
   };
 }
 
+export function save_latao(lataoAtual) {
+  return {
+    type: 'SAVE_LATAO',
+    lataoAtual,
+  };
+}
+
+
 export function save_linhas(linhas) {
   return {
     type: 'SAVE_LINHAS',

@@ -8,13 +8,15 @@ import { bindActionCreators } from 'redux'
 import AsyncStorage from '@react-native-community/async-storage';
 import { ActivityIndicator } from 'react-native';
 import getRealm from '../services/realm';
+import api from '../services/api';
+import axios from 'axios';
 
 function Routes({ save_linhaID, save_linhas, identificado, saveVeiculo, save_linha, save_coleta, adicionar_horaF, adicionar_horaI, transmitir_coleta, save_tanque, adicionar_data }) {
   const [verificar, setVerificar] = useState(true);
 
   useEffect(() => {
-    async function verificarImei() {
 
+    async function verificarImei() {
       /*await AsyncStorage.clear();
       const realm = await getRealm();
       Realm.deleteFile({

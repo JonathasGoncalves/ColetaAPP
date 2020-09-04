@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { Dimensions } from 'react-native';
 
 const styles = StyleSheet.create({
 
@@ -12,7 +13,13 @@ const styles = StyleSheet.create({
     //marginBottom: 10,
     padding: 10,
     textAlign: "center"
-
+  },
+  viewMainFlatList: {
+    marginRight: 10,
+    marginLeft: 10,
+    marginTop: 2,
+    backgroundColor: 'white',
+    height: (Dimensions.get("window").height) * 0.8,
   },
   textButtonContinuar: {
     fontSize: 20,
@@ -49,7 +56,7 @@ const styles = StyleSheet.create({
   },
   viewMain: {
     marginRight: 10,
-    marginLeft: 10,
+    //marginLeft: 10,
     marginTop: 2,
     backgroundColor: 'white'
   },
@@ -57,7 +64,27 @@ const styles = StyleSheet.create({
     width: 200,
     backgroundColor: '#F9690E',
     alignSelf: 'center'
-  }
+  },
+  viewTotalColetado: {
+    backgroundColor: '#e5e8e8',
+    //marginLeft: 10,
+    marginTop: 10,
+    //alignSelf: 'center',
+    alignItems: 'center',
+    height: Dimensions.get("window").height * 0.2,
+    width: Dimensions.get("window").width * 0.5,
+  },
+  ValueTotalColetado: {
+    //marginLeft: 10,
+    marginTop: 5,
+    fontSize: 18,
+    color: 'black'
+  },
+  textTotalColetado: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black'
+  },
 });
 
 export default styles;

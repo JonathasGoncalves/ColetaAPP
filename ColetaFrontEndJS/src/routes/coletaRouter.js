@@ -5,7 +5,9 @@ import Linha from '../pages/linha';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Coleta from '../pages/coleta/index';
+import TanqueColeta from '../pages/coleta/tanqueColeta';
 import LataoColeta from '../pages/coleta/lataoColeta';
+import LataoList from '../pages/coleta/lataoList';
 import Finalizar from '../pages/coleta/finalizarColeta';
 import { connect } from 'react-redux';
 import * as actionsIMEI from '../store/actions/imeiActions';
@@ -55,8 +57,46 @@ function ColetaStack() {
             backgroundColor: 'white'
           }
         }}
+        name="Tanque"
+        component={TanqueColeta}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Coletar Latão',
+          unmountOnBlur: true,
+          headerStyle: {
+            backgroundColor: '#F9690E',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            alignSelf: 'center',
+          },
+          cardStyle: {
+            backgroundColor: 'white'
+          }
+        }}
         name="Latao"
         component={LataoColeta}
+      />
+      <Stack.Screen
+        options={{
+          title: 'Coletar Latão',
+          unmountOnBlur: true,
+          headerStyle: {
+            backgroundColor: '#F9690E',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            alignSelf: 'center',
+          },
+          cardStyle: {
+            backgroundColor: 'white'
+          }
+        }}
+        name="LataoList"
+        component={LataoList}
       />
     </Stack.Navigator>
   );
