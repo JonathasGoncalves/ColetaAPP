@@ -83,6 +83,13 @@ export function salvar_total_coletado(totalColetado) {
   };
 }
 
+export function salvar_total_coletadoOff(totalColetadoOff) {
+  return {
+    type: 'SAVE_TOTAL_COLETADO_OFF',
+    totalColetadoOff: totalColetadoOff
+  };
+}
+
 
 
 

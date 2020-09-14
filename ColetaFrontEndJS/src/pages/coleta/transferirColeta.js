@@ -20,7 +20,7 @@ import * as actionsIMEI from '../../store/actions/imeiActions';
 import { ScrollView } from 'react-native-gesture-handler';
 import NetInfo from "@react-native-community/netinfo";
 
-const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, navigation, save_coleta, cod_linha, placa, transmitir_coleta, adicionar_horaF, imei }) => {
+const Transferir = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, navigation, save_coleta, cod_linha, placa, transmitir_coleta, adicionar_horaF, imei }) => {
 
   const [loading, setLoading] = useState(false);
   const [odometro, setOdometro] = useState('');
@@ -31,6 +31,7 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
   const [volumeOc, setVolumeOc] = useState(0);
   const [grid, setGrid] = useState([]);
   const [isConnected, setIsConnected] = useState(true);
+  const [placaState, setPlaca] = useState('');
 
   //@finalizado 1 coleta; 2 falta finalizar; 3 falta transmitir
   useEffect(() => {
@@ -193,6 +194,8 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
     if (isConnected) {
 
 
+
+
       //criar array no formato que a api recebe
       setTransmitindo(true);
       setLoading(true);
@@ -200,6 +203,11 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
       await AsyncStorage.setItem('@OdometroF', odometro);
 
       try {
+
+        const response = await api.post('api/transportadora/verificarPlaca', {
+          placa: placaState
+        })
+
         var mes = '';
         var date = new Date().getDate();
         var month = new Date().getMonth() + 1;
@@ -218,9 +226,9 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
 
         const responseColeta = await api.post('api/coleta/NovaColeta', {
           data: data,
-          transportador: veiculo.COD_TRANSPORTADORA,
-          motorista: veiculo.COD_MOTORISTA,
-          veiculo: veiculo.VEICULO,
+          transportador: response.data.motorista.COD_TRANSPORTADORA,
+          motorista: response.data.motorista.COD_MOTORISTA,
+          veiculo: response.data.motorista.VEICULO,
           odometroI: odometroI,
           odometroF: odometroF
         })
@@ -231,10 +239,6 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
             coletaItem.lataoList.map((latao) => {
               if (coletaItem.volume > 0 && coletaItem.cod_ocorrencia == '') {
 
-                /*volumeOC = 0;
-                if (coletaItem.cod_ocorrencia != '') {
-                  volumeOC = coletaItem.volume;
-                }*/
                 temp = 0;
                 if (coletaItem.temperatura >= 0) {
                   temp = parseFloat(coletaItem.temperatura)
@@ -294,11 +298,9 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
                 volume_fora_padrao: volumeOC
               };
               coletaRequest.push(coletaUnidade);
-
             }
           })
         })
-
 
         try {
           const responseTanques = await api.post('api/coleta/NovaColetaItem', {
@@ -317,12 +319,19 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
           console.log(error);
         }
       } catch (error) {
+        Alert.alert(
+          'Erro!',
+          'Placa inválida!',
+          [
+            { text: 'ok', onPress: () => sair() },
+          ]
+        );
         console.log(error);
       }
 
       Alert.alert(
         'Sucesso!',
-        'Coleta transmitida!',
+        'Coleta transferida!',
         [
           { text: 'ok', onPress: () => sair() },
         ]
@@ -346,13 +355,11 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
   }
 
   async function updateTanques() {
-
     const responseTanques = await api.post('api/tanque/TanquesInLinhas', {
       linhas: linhas
     })
     const realm = await getRealm();
     temp = [];
-
     let allTanque = realm.objects('Tanque');
     realm.write(() => {
       realm.delete(allTanque)
@@ -379,7 +386,6 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
 
   return (
     <Container>
-
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -390,7 +396,6 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
             flex: 1,
             justifyContent: "space-around"
           }}>
-
 
             {loading || transmitindo ? (
               <ActivityIndicator size="large" color="green" />
@@ -403,6 +408,20 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
                       data={grid}
                       keyExtractor={item => item.id}
                       renderItem={({ item }) => renderTotal(item)}
+                    />
+                  </View>
+
+                  <View style={{ marginTop: 20 }}>
+                    <Text allowFontScaling={false} style={styles.textDescOdometro}>
+                      Placa Destino
+                    </Text>
+                    <TextInput
+                      maxLength={9}
+                      //keyboardType='numeric'
+                      editable={!loading}
+                      style={styles.inputPlaca}
+                      value={placaState}
+                      onChangeText={text => setPlaca(text)}
                     />
                   </View>
 
@@ -457,4 +476,4 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
   bindActionCreators({ ...actionsIMEI, ...actionsColeta }, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(Finalizar);
+export default connect(mapStateToProps, mapDispatchToProps)(Transferir);

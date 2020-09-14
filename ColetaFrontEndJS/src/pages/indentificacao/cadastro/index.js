@@ -97,7 +97,7 @@ const Cadastro = ({ save_coleta, adicionar_horaI, adicionar_data, saveVeiculo, s
         } catch (error) {
           Alert.alert(
             'Erro',
-            JSON.stringify(error),
+            'Não foi possivel carregar as informações!',
             [
               { text: 'ok' },
             ]
@@ -107,7 +107,7 @@ const Cadastro = ({ save_coleta, adicionar_horaI, adicionar_data, saveVeiculo, s
       } catch (error) {
         Alert.alert(
           'Erro',
-          JSON.stringify(error),
+          'Placa inválida!',
           [
             { text: 'ok' },
           ]
@@ -158,6 +158,7 @@ const Cadastro = ({ save_coleta, adicionar_horaI, adicionar_data, saveVeiculo, s
                   Odômetro Inicial
               </Text>
                 <TextInput
+                  keyboardType='numeric'
                   editable={!loading}
                   style={styles.inputPlaca}
                   value={odometro}

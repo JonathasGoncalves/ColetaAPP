@@ -14,7 +14,7 @@ import Finalizar from './finalizarColeta';
 import { CommonActions } from '@react-navigation/native';
 import calcularTotalColetado from '../../functions/totalColeta';
 
-const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_coleta, save_tanque, coleta, tanqueAtual, data }) => {
+const Coleta = ({ salvar_total_coletado, salvar_total_coletadoOff, totalColetado, totalColetadoOff, id_linha, linhas, cod_linha, navigation, save_coleta, save_tanque, coleta, tanqueAtual, data }) => {
 
   const [tanques, setTanques] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,13 +23,8 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
   const [totalColetadoOffState, setTotalColetadoOffState] = useState(0);
 
   useEffect(() => {
-    //console.log(coleta[0]);
 
-    if (coleta) {
-      total = calcularTotalColetado(coleta);
-      setTotalColetado(total.total);
-      setTotalColetadoOffState(total.totalOff);
-    }
+
     navigation.setOptions({
       headerRight: () => (
         <View>
@@ -129,12 +124,9 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
         }
       });
     }
-
-    //console.log(coletaCopy.length);
     coletaCopy.map((coletaItem) => {
       if (coletaItem.id == cod_linha) {
         if (coletaItem.coleta.length <= 0) {
-          //console.log('coletaItem.coleta.length');
           buscarTanques();
         }
       }
@@ -208,8 +200,10 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
       save_coleta(copyColeta);
       AsyncStorage.setItem('@coleta', JSON.stringify(copyColeta));
       total = calcularTotalColetado(copyColeta);
-      setTotalColetado(total.total);
-      setTotalColetadoOffState(total.totalOff);
+      //setTotalColetado(total.total);
+      //setTotalColetadoOffState(total.totalOff);
+      salvar_total_coletado(total.total);
+      salvar_total_coletadoOff(total.totalOff);
       setLoading(false);
     }
 
@@ -258,11 +252,11 @@ const Coleta = ({ totalColetado, id_linha, linhas, cod_linha, navigation, save_c
             <View style={{ flexDirection: 'row', flex: 1 }}>
               <View style={styles.viewTotalColetado}>
                 <Text style={styles.textTotalColetado}>Total Coletado</Text>
-                <Text style={styles.ValueTotalColetado}>{totalColetadoState}</Text>
+                <Text style={styles.ValueTotalColetado}>{totalColetado}</Text>
               </View>
               <View style={styles.viewTotalColetado}>
                 <Text style={styles.textTotalColetado}>Total Fora do Padrão</Text>
-                <Text style={styles.ValueTotalColetado}>{totalColetadoOffState}</Text>
+                <Text style={styles.ValueTotalColetado}>{totalColetadoOff}</Text>
               </View>
             </View>
 
@@ -282,7 +276,8 @@ const mapStateToProps = state => ({
   data: state.Coleta.data,
   linhas: state.Coleta.linhas,
   id_linha: state.Coleta.id_linha,
-  totalColetado: state.Coleta.totalColetado
+  totalColetado: state.Coleta.totalColetado,
+  totalColetadoOff: state.Coleta.totalColetadoOff
 });
 
 const mapDispatchToProps = dispatch =>

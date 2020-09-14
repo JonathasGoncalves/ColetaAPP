@@ -14,18 +14,14 @@ import Geolocation from '@react-native-community/geolocation';
 import calcularTotalColetado from '../../functions/totalColeta';
 
 
-const LataoList = ({ save_latao, id_linha, coleta, tanqueAtual, navigation, save_coleta, save_tanque, cod_linha }) => {
+const LataoList = ({ salvar_total_coletadoOff, salvar_total_coletado, totalColetado, totalColetadoOff, save_latao, id_linha, coleta, tanqueAtual, navigation, save_coleta, save_tanque, cod_linha }) => {
 
   const [latao, setLatao] = useState(0);
   const [totalColetadoState, setTotalColetado] = useState(0);
   const [totalColetadoOffState, setTotalColetadoOffState] = useState(0);
 
   useEffect(() => {
-    console.log(tanqueAtual);
-    total = calcularTotalColetado(coleta);
-    setTotalColetado(total.total);
-    setTotalColetadoOffState(total.totalOff);
-  }, [tanqueAtual])
+  }, [])
 
   navigation.setOptions({
     headerRight: () => (
@@ -44,7 +40,7 @@ const LataoList = ({ save_latao, id_linha, coleta, tanqueAtual, navigation, save
   });
 
   function coletarLatao(latao) {
-    console.log(latao.volume);
+
     /*if (latao.volume > 0) {
       //setVolume(String(latao.volume));
     } else {
@@ -70,12 +66,11 @@ const LataoList = ({ save_latao, id_linha, coleta, tanqueAtual, navigation, save
   }
 
   async function limparColeta(indexTanque, index) {
-    setLoading(true);
+
     var copyColeta = coleta;
     temp = parseInt(copyColeta[id_linha].coleta[indexTanque].volume);
     temp2 = parseInt(copyColeta[id_linha].coleta[indexTanque].lataoList[index].volume);
     copyColeta[id_linha].coleta[indexTanque].volume = temp - temp2;
-    //copyColeta[id_linha].coleta[indexTanque].volume = copyColeta[id_linha].coleta[indexTanque].volume - copyColeta[id_linha].coleta[indexTanque].lataoList[index].volume_fora_padrao;
     copyColeta[id_linha].coleta[indexTanque].lataoList[index].hora = '';
     copyColeta[id_linha].coleta[indexTanque].lataoList[index].data = '';
     copyColeta[id_linha].coleta[indexTanque].lataoList[index].volume = 0;
@@ -85,10 +80,10 @@ const LataoList = ({ save_latao, id_linha, coleta, tanqueAtual, navigation, save
     }
     save_coleta(copyColeta);
     total = calcularTotalColetado(copyColeta);
-    setTotalColetado(total.total);
-    setTotalColetadoOffState(total.totalOff)
+    salvar_total_coletado(total.total);
+    salvar_total_coletadoOff(total.totalOff);
     AsyncStorage.setItem('@coleta', JSON.stringify(copyColeta));
-    setLoading(false);
+
   }
 
   function renderLataoList(latao) {
@@ -138,11 +133,11 @@ const LataoList = ({ save_latao, id_linha, coleta, tanqueAtual, navigation, save
       <View style={{ flexDirection: 'row', flex: 1 }}>
         <View style={styles.viewTotalColetado}>
           <Text style={styles.textTotalColetado}>Total Coletado</Text>
-          <Text style={styles.ValueTotalColetado}>{totalColetadoState}</Text>
+          <Text style={styles.ValueTotalColetado}>{totalColetado}</Text>
         </View>
         <View style={styles.viewTotalColetado}>
           <Text style={styles.textTotalColetado}>Total Fora do Padrão</Text>
-          <Text style={styles.ValueTotalColetado}>{totalColetadoOffState}</Text>
+          <Text style={styles.ValueTotalColetado}>{totalColetadoOff}</Text>
         </View>
       </View>
     </View>
@@ -155,6 +150,8 @@ const mapStateToProps = state => ({
   coleta: state.Coleta.coleta,
   cod_linha: state.Coleta.cod_linha,
   id_linha: state.Coleta.id_linha,
+  totalColetado: state.Coleta.totalColetado,
+  totalColetadoOff: state.Coleta.totalColetadoOff
 });
 
 const mapDispatchToProps = dispatch =>

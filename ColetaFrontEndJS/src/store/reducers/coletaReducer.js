@@ -11,7 +11,8 @@ const INITIAL_STATE = {
   data: '',
   linhas: [],
   id_linha: 0,
-  totalColetado: 0
+  totalColetado: 0,
+  totalColetadoOff: 0
 }
 export default function Coleta(state = INITIAL_STATE, action) {
   switch (action.type) {
@@ -82,6 +83,11 @@ export default function Coleta(state = INITIAL_STATE, action) {
       return {
         ...state,
         data: action.data,
+      }
+    case 'SAVE_TOTAL_COLETADO_OFF':
+      return {
+        ...state,
+        totalColetadoOff: action.totalColetadoOff,
       }
     default:
       return state;

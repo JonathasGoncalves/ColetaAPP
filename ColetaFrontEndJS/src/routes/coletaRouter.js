@@ -9,6 +9,7 @@ import TanqueColeta from '../pages/coleta/tanqueColeta';
 import LataoColeta from '../pages/coleta/lataoColeta';
 import LataoList from '../pages/coleta/lataoList';
 import Finalizar from '../pages/coleta/finalizarColeta';
+import Transferir from '../pages/coleta/transferirColeta';
 import { connect } from 'react-redux';
 import * as actionsIMEI from '../store/actions/imeiActions';
 import * as actionsColeta from '../store/actions/coletaActions';
@@ -76,8 +77,8 @@ function ColetaStack() {
             backgroundColor: 'white'
           }
         }}
-        name="Latao"
-        component={LataoColeta}
+        name="LataoList"
+        component={LataoList}
       />
       <Stack.Screen
         options={{
@@ -95,9 +96,10 @@ function ColetaStack() {
             backgroundColor: 'white'
           }
         }}
-        name="LataoList"
-        component={LataoList}
+        name="Latao"
+        component={LataoColeta}
       />
+
     </Stack.Navigator>
   );
 }
@@ -202,6 +204,32 @@ function FinalizarStack() {
   );
 }
 
+function TransferirStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: true }}>
+      <Stack.Screen
+        options={{
+          title: 'Coletar Tanque',
+          unmountOnBlur: true,
+          headerStyle: {
+            backgroundColor: '#F9690E',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            alignSelf: 'center',
+          },
+          cardStyle: {
+            backgroundColor: 'white'
+          }
+        }}
+        name="transferir"
+        component={Transferir}
+      />
+    </Stack.Navigator>
+  );
+}
+
 function MAIN() {
   return (
     <Drawer.Navigator
@@ -231,6 +259,13 @@ function MAIN() {
         }}
         name="Finalizar"
         component={FinalizarStack}
+      />
+      <Drawer.Screen
+        options={{
+          unmountOnBlur: true,
+        }}
+        name="Transferir"
+        component={TransferirStack}
       />
     </Drawer.Navigator>
   );

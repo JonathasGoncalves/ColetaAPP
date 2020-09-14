@@ -13,7 +13,8 @@ import { date, time } from '../../functions/tempo';
 import Geolocation from '@react-native-community/geolocation';
 import calcularTotalColetado from '../../functions/totalColeta';
 
-const LataoColeta = ({ save_latao, lataoAtual, id_linha, coleta, tanqueAtual, navigation, save_coleta, save_tanque, cod_linha }) => {
+
+const LataoColeta = ({ salvar_total_coletadoOff, salvar_total_coletado, save_latao, lataoAtual, id_linha, coleta, tanqueAtual, navigation, save_coleta, save_tanque, cod_linha }) => {
 
   const [coletando, setColetando] = useState(false);
   const [volume, setVolume] = useState('');
@@ -29,12 +30,9 @@ const LataoColeta = ({ save_latao, lataoAtual, id_linha, coleta, tanqueAtual, na
   }
 
   useEffect(() => {
-
-    console.log(lataoAtual);
-    total = calcularTotalColetado(coleta);
-    setTotalColetado(total.total);
-    setTotalColetadoOffState(total.totalOff);
-    setVolume(lataoAtual.volume);
+    if (lataoAtual.volume > 0) {
+      setVolume(String(lataoAtual.volume));
+    }
 
   }, [])
 
@@ -56,7 +54,7 @@ const LataoColeta = ({ save_latao, lataoAtual, id_linha, coleta, tanqueAtual, na
 
 
   async function onPressColetar() {
-
+    setLoading(true);
     dataFormat = date();
     timeFormat = time();
     var copyColeta = coleta;
@@ -81,16 +79,28 @@ const LataoColeta = ({ save_latao, lataoAtual, id_linha, coleta, tanqueAtual, na
       }
     })
 
-    total = calcularTotalColetado(coleta);
-    setTotalColetado(total.total);
-    setTotalColetadoOffState(total.totalOff);
+
+    //setTotalColetado(total.total);
+    //setTotalColetadoOffState(total.totalOff);
     await AsyncStorage.setItem('@tanqueAtual', JSON.stringify(copyColeta[id_linha].coleta[indexTanque]));
     await AsyncStorage.setItem('@coleta', JSON.stringify(copyColeta));
     save_tanque(copyColeta[id_linha].coleta[indexTanque]);
     save_coleta(copyColeta);
     save_latao(lataoTemp);
-    //navigation.navigate('LataoList');
+    total = calcularTotalColetado(coleta);
+    salvar_total_coletado(total.total);
+    salvar_total_coletadoOff(total.totalOff);
+
+
+    navigation.dispatch(state => {
+      const routes = state.routes.filter(r => r.name !== 'Home');
+      return CommonActions.reset({
+        index: 0,
+        routes
+      });
+    });
     navigation.goBack();
+    setLoading(false);
   }
 
   return (
@@ -104,7 +114,7 @@ const LataoColeta = ({ save_latao, lataoAtual, id_linha, coleta, tanqueAtual, na
             </View>
             <View style={{ flexDirection: 'column', flex: 1 }}>
               <Text style={styles.textInfoColeta}>Latão</Text>
-              <Text style={styles.ValueInfoColeta}>{latao}</Text>
+              <Text style={styles.ValueInfoColeta}>{lataoAtual.latao}</Text>
             </View>
           </View>
 

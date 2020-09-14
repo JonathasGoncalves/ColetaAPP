@@ -14,7 +14,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { time, date } from '../../functions/tempo';
 import calcularTotalColetado from '../../functions/totalColeta';
 
-const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar_data, adicionar_horaI, save_coleta }) => {
+const Linha = ({ totalColetado, totalColetadoOff, save_linhaID, coleta, linhas, navigation, save_linha, adicionar_data, adicionar_horaI, save_coleta }) => {
   const [linhasRender, setLinhas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [path, setPath] = React.useState('');
@@ -41,9 +41,9 @@ const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar
   */
   useEffect(() => {
 
-    total = calcularTotalColetado(coleta);
-    setTotalColetado(total.total);
-    setTotalColetadoOffState(total.totalOff);
+    //total = calcularTotalColetado(coleta);
+    //setTotalColetado(total.total);
+    //setTotalColetadoOffState(total.totalOff);
 
     //buscar linhas da base local
     async function pupularColeta() {
@@ -55,12 +55,10 @@ const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar
         });
       })
       save_coleta(coletaTemp);
-      console.log(coletaTemp);
       await AsyncStorage.setItem('@coleta', JSON.stringify(coletaTemp));
     }
 
     async function buscarLinhas() {
-
 
       const realm = await getRealm();
       const results = realm
@@ -79,13 +77,11 @@ const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar
     buscarLinhas();
 
     //executa somente uma vez
-    console.log('coleta.length ' + coleta.length);
     if (coleta.length == 0) {
       pupularColeta();
     }
 
     //adiconando configurações do header
-
     navigation.setOptions({ title: 'Realizar Coleta' });
     navigation.setOptions({
       headerLeft: () => (
@@ -96,6 +92,7 @@ const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar
         </Button>
       ),
     });
+
     navigation.setOptions({
       headerRight: () => (
         <View></View>
@@ -111,18 +108,6 @@ const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar
         AsyncStorage.setItem('@idlinha', JSON.stringify(id));
       }
     })
-
-    /*const hora = time();
-    const data = date();
-
-   
-    adicionar_horaI(hora);
-    await AsyncStorage.setItem('@horaI', hora);
-    await AsyncStorage.setItem('@data', data);
-    await AsyncStorage.setItem('@emAberto', 'true');
-    adicionar_data(data);*/
-    //await AsyncStorage.setItem('@finalizado', '1');
-    //transmitir_coleta('1');
     await AsyncStorage.setItem('@linha', cod_linha);
     save_linha(cod_linha);
     navigation.navigate('Coleta');
@@ -162,11 +147,11 @@ const Linha = ({ save_linhaID, coleta, linhas, navigation, save_linha, adicionar
           <View style={{ flexDirection: 'row', flex: 1 }}>
             <View style={styles.viewTotalColetado}>
               <Text style={styles.textTotalColetado}>Total Coletado</Text>
-              <Text style={styles.ValueTotalColetado}>{totalColetadoState}</Text>
+              <Text style={styles.ValueTotalColetado}>{totalColetado}</Text>
             </View>
             <View style={styles.viewTotalColetado}>
               <Text style={styles.textTotalColetado}>Total Fora do Padrão</Text>
-              <Text style={styles.ValueTotalColetado}>{totalColetadoOffState}</Text>
+              <Text style={styles.ValueTotalColetado}>{totalColetadoOff}</Text>
             </View>
           </View>
 
@@ -183,7 +168,9 @@ const mapStateToProps = state => ({
   imei: state.Identificacao.imei,
   cod_linha: state.Coleta.cod_linha,
   coleta: state.Coleta.coleta,
-  linhas: state.Coleta.linhas
+  linhas: state.Coleta.linhas,
+  totalColetado: state.Coleta.totalColetado,
+  totalColetadoOff: state.Coleta.totalColetadoOff
 });
 
 const mapDispatchToProps = dispatch =>

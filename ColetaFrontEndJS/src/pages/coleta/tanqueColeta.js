@@ -13,32 +13,21 @@ import { date, time } from '../../functions/tempo';
 import Geolocation from '@react-native-community/geolocation';
 import calcularTotalColetado from '../../functions/totalColeta';
 
-const TanqueColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, save_tanque, cod_linha }) => {
+const TanqueColeta = ({ salvar_total_coletado, salvar_total_coletadoOff, id_linha, coleta, tanqueAtual, navigation, save_coleta, save_tanque, cod_linha }) => {
 
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [coletando, setColetando] = useState(false);
-  const [info, setInfo] = useState(true);
   const [odometro, setOdometro] = useState('');
   const [volume, setVolume] = useState('');
   const [temperatura, setTemperatura] = useState('');
   const [loading, setLoading] = useState(false);
-  const [latao, setLatao] = useState(0);
   const [obs, setObs] = useState('');
   const [obsType, setObsType] = useState('');
   const [editableLabel, setEditableLabel] = useState(true);
-  const [dateSave, setDate] = useState('');
-  const [totalColetadoState, setTotalColetado] = useState(0);
-  const [totalColetadoOffState, setTotalColetadoOffState] = useState(0);
+  const [tempInvalida, setTemInvalida] = useState(false);
 
   useEffect(() => {
-    console.log('useEffect TanqueColeta');
-    total = calcularTotalColetado(coleta);
-    setTotalColetado(total.total);
-    setTotalColetadoOffState(total.totalOff)
-
-
-
     function setLocalizacao(geolocation) {
       setLatitude(String(geolocation.coords.latitude));
       setLongitude(String(geolocation.coords.longitude));
@@ -56,7 +45,7 @@ const TanqueColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, 
       );
     }
     setObs(tanqueAtual.observacao);
-    setTemperatura(tanqueAtual.temperatura);
+    setTemperatura(String(tanqueAtual.temperatura));
     setOdometro(tanqueAtual.odometro);
 
     if (tanqueAtual.cod_ocorrencia != '') {
@@ -84,6 +73,12 @@ const TanqueColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, 
 
   function setTemperaturaAction(text) {
     newText = text.replace(/[^0-9.]/g, '');
+
+    if (parseInt(newText) > 99.9) {
+      setTemInvalida(true);
+    } else {
+      setTemInvalida(false);
+    }
     setTemperatura(newText);
   }
 
@@ -99,13 +94,7 @@ const TanqueColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, 
 
 
   function handleBackButtonClick() {
-    console.log('handleBackButtonClick');
-    console.log(coletando);
-    console.log(info);
     if (coletando) {
-      console.log('handleBackButtonClick1');
-      console.log(coletando);
-      console.log(info);
       setColetando(!coletando);
       return true;
     } else {
@@ -122,9 +111,10 @@ const TanqueColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, 
   }
 
   async function onPressInfo() {
+    setLoading(true);
+
     const dataFormat = date();
     const timeFormat = time();
-    setDate(dataFormat);
 
     var copyColeta = coleta;
     var tanqueTemp = {};
@@ -143,23 +133,37 @@ const TanqueColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, 
         tanqueMap.cod_ocorrencia = obsType;
         tanqueMap.observacao = obs;
         tanqueMap.odometro = odometro;
-        tanqueMap.temperatura = temperatura;
+        if (temperatura != '') {
+          tanqueMap.temperatura = parseFloat(temperatura);
+        } else {
+          tanqueMap.temperatura = 0;
+        }
         tanqueTemp = tanqueMap;
       }
     })
 
+    total = calcularTotalColetado(copyColeta);
+    salvar_total_coletado(total.total);
+    salvar_total_coletadoOff(total.totalOff);
+
     save_tanque(tanqueTemp);
     await AsyncStorage.setItem('@tanqueAtual', JSON.stringify(tanqueTemp));
     await AsyncStorage.setItem('@coleta', JSON.stringify(copyColeta));
-    //await AsyncStorage.setItem('@finalizado', '1');
     save_coleta(copyColeta);
     if (obsType != '') {
+      navigation.dispatch(state => {
+        // Remove the home route from the stack
+        const routes = state.routes.filter(r => r.name !== 'Home');
+        return CommonActions.reset({
+          index: 0,
+          routes
+        });
+      });
       navigation.goBack();
+      setLoading(false);
     } else {
-      setInfo(false);
-      //console.log('hardwareBackPress remove tanque');
-      //BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
       navigation.navigate('LataoList');
+      setLoading(false);
     }
   }
 
@@ -208,6 +212,7 @@ const TanqueColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, 
                 value={temperatura}
                 onChangeText={text => setTemperaturaAction(text)}
               />
+              {tempInvalida && <Text allowFontScaling={false} style={{ alignSelf: 'center', color: 'red' }}>Temperatura precisa ser menor que 99.9</Text>}
               <View >
                 <ListItem style={{ borderColor: 'white' }}>
                   <Left>
@@ -305,7 +310,9 @@ const TanqueColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, 
             </ScrollView>
             <Button
               block
-              style={(obsType == '' && (odometro.length <= 0 || temperatura.length <= 0) || (obsType != '' && (odometro.length <= 0)) || (obsType == '003' && (volume.length <= 0))) ? styles.buttonContinuarPress : styles.buttonContinuar}
+              style={(obsType == '' && (odometro.length <= 0 || temperatura.length <= 0) || (obsType != '' && (odometro.length <= 0)) || (obsType == '003' && (volume.length <= 0)) ||
+                (obsType == '004' && (obs.length <= 0)) ||
+                loading || tempInvalida) ? styles.buttonContinuarPress : styles.buttonContinuar}
               rounded={true}
               onPress={onPressInfo}
               disabled={
@@ -313,7 +320,9 @@ const TanqueColeta = ({ id_linha, coleta, tanqueAtual, navigation, save_coleta, 
                   odometro.length <= 0 ||
                   (obsType == '' && (odometro.length <= 0 || temperatura.length <= 0)) ||
                   (obsType == '003' && (volume.length <= 0))) ||
-                (obsType == '004' && (obs.length <= 0))
+                (obsType == '004' && (obs.length <= 0) ||
+                  loading || tempInvalida
+                )
               }
             >
               <Text allowFontScaling={false} style={styles.textButtonContinuar}>Continuar</Text>
