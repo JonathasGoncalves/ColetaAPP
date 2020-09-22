@@ -34,7 +34,7 @@ const TanqueColeta = ({ salvar_total_coletado, salvar_total_coletadoOff, id_linh
     }
 
     try {
-      //Geolocation.getCurrentPosition(info => setLocalizacao(info));
+      Geolocation.getCurrentPosition(info => setLocalizacao(info));
     } catch (error) {
       Alert.alert(
         'Atenção!',
@@ -88,6 +88,7 @@ const TanqueColeta = ({ salvar_total_coletado, salvar_total_coletadoOff, id_linh
   }
 
   function setVolumeAction(text) {
+    setObs('');
     newText = text.replace(/[^0-9]/g, '');
     setVolume(newText);
   }
@@ -133,6 +134,8 @@ const TanqueColeta = ({ salvar_total_coletado, salvar_total_coletadoOff, id_linh
         tanqueMap.cod_ocorrencia = obsType;
         tanqueMap.observacao = obs;
         tanqueMap.odometro = odometro;
+        tanqueMap.latitude = latitude;
+        tanqueMap.longitude = longitude;
         if (temperatura != '') {
           tanqueMap.temperatura = parseFloat(temperatura);
         } else {
@@ -168,6 +171,9 @@ const TanqueColeta = ({ salvar_total_coletado, salvar_total_coletadoOff, id_linh
   }
 
   function setObsTypeFunction(type) {
+    if (type == '004') {
+      setVolume('');
+    }
     if (type == obsType) {
       setObsType('');
       //setTemperatura(0);
@@ -285,12 +291,20 @@ const TanqueColeta = ({ salvar_total_coletado, salvar_total_coletadoOff, id_linh
                 {obsType == '004' &&
                   <>
                     <Text allowFontScaling={false} style={styles.textTitulo}>Observações</Text>
-                    <TextInput
-                      multiline={true}
-                      style={styles.inputPlaca}
-                      value={obs}
-                      onChangeText={text => setObs(text)}
-                    />
+                    <View>
+                      <TextInput
+                        returnKeyType='done'
+                        returnKeyLabel="OK"
+                        blurOnSubmit={true}
+                        multiline={true}
+                        style={styles.inputPlaca}
+                        value={obs}
+                        onChangeText={text => setObs(text)}
+                      >
+                      </TextInput>
+                    </View>
+
+
                   </>
                 }
                 {obsType == '003' &&

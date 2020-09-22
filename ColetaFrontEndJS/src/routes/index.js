@@ -11,6 +11,7 @@ import getRealm from '../services/realm';
 import api from '../services/api';
 import axios from 'axios';
 import calcularTotalColetado from '../functions/totalColeta';
+import { time } from '../functions/tempo';
 
 function Routes({
   salvar_total_coletado,
@@ -32,14 +33,61 @@ function Routes({
   useEffect(() => {
 
     async function verificarImei() {
+
       /*await AsyncStorage.clear();
       const realm = await getRealm();
       Realm.deleteFile({
         path: realm.path
       })*/
 
-      const veiculo = await AsyncStorage.getItem('@veiculo');
+      /* armazerar credenciais do client laravel 
+      ClientProtheus
+      Client ID: 3
+      Client secret: vIxglRP4x3MuD08Gy02SzFjQTWp1aDuxOGeHhZkf
+      */
 
+      const clientIDVerificar = await AsyncStorage.getItem('@Client');
+
+      if (!clientIDVerificar) {
+        await AsyncStorage.setItem('@Client', '3');
+        await AsyncStorage.setItem('@Secret', 'snu85ywkg1WhoTn5enQ9jLBvCHWeRq8IOBt087o7');
+      }
+      const clientID = await AsyncStorage.getItem('@Client');
+      const clientSecret = await AsyncStorage.getItem('@Secret');
+      const access_token = await AsyncStorage.getItem('@access_token');
+
+      if (!access_token) {
+        const responseToken = await api.post('oauth/token', {
+          grant_type: 'client_credentials',
+          client_id: clientID,
+          client_secret: clientSecret
+        })
+        await AsyncStorage.setItem('@access_token', responseToken.data.access_token);
+        await AsyncStorage.setItem('@expires_in', String(responseToken.data.expires_in));
+      } else {
+        async function changeTimezone(date, ianatz) {
+          const expires_in_tmp = await AsyncStorage.getItem('@expires_in');
+          const expires_in = parseInt(expires_in_tmp);
+          var invdate = new Date(date.toLocaleString('pt-BR', {
+            timeZone: ianatz
+          }));
+          var diff = new Date(invdate.getTime() + expires_in * 1000);
+          return new Date(diff);
+        }
+        var agora = new Date();
+        var expirar = await changeTimezone(agora, 'America/Sao_Paulo');
+        if (expirar.getTime() < agora.getTime()) {
+          const responseToken = await api.post('oauth/token', {
+            grant_type: 'client_credentials',
+            client_id: clientID,
+            client_secret: clientSecret
+          })
+
+          await AsyncStorage.setItem('@access_token', responseToken.data.access_token);
+          await AsyncStorage.setItem('@expires_in', String(responseToken.data.expires_in));
+        }
+      }
+      const veiculo = await AsyncStorage.getItem('@veiculo');
       if (veiculo) {
         const emAbertoStorage = await AsyncStorage.getItem('@emAberto');
         if (emAbertoStorage == 'true') {

@@ -44,6 +44,7 @@ const Cadastro = ({ save_coleta, adicionar_horaI, adicionar_data, saveVeiculo, s
           const responseLinhas = await api.post('api/linha/linhasPorVeiculo', {
             veiculo: response.data.motorista.VEICULO
           })
+          console.log(responseLinhas);
           linhas = [];
           for (linhaItem of responseLinhas.data.linhas) {
             linhas.push(linhaItem.linha);
@@ -95,6 +96,7 @@ const Cadastro = ({ save_coleta, adicionar_horaI, adicionar_data, saveVeiculo, s
           saveVeiculo(response.data.motorista);
 
         } catch (error) {
+          console.log(error);
           Alert.alert(
             'Erro',
             'Não foi possivel carregar as informações!',
@@ -105,6 +107,7 @@ const Cadastro = ({ save_coleta, adicionar_horaI, adicionar_data, saveVeiculo, s
         }
 
       } catch (error) {
+        console.log(error);
         Alert.alert(
           'Erro',
           'Placa inválida!',

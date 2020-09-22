@@ -56,7 +56,6 @@ const Transferir = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, 
     });
 
     NetInfo.fetch().then(state => {
-      console.log(state.isConnected);
       setIsConnected(state.isConnected);
     });
 
@@ -204,9 +203,7 @@ const Transferir = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, 
 
       try {
 
-        const response = await api.post('api/transportadora/verificarPlaca', {
-          placa: placaState
-        })
+
 
         var mes = '';
         var date = new Date().getDate();
@@ -224,14 +221,29 @@ const Transferir = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, 
         const odometroI = await AsyncStorage.getItem('@OdometroI');
         const odometroF = await AsyncStorage.getItem('@OdometroF');
 
-        const responseColeta = await api.post('api/coleta/NovaColeta', {
-          data: data,
-          transportador: response.data.motorista.COD_TRANSPORTADORA,
-          motorista: response.data.motorista.COD_MOTORISTA,
-          veiculo: response.data.motorista.VEICULO,
-          odometroI: odometroI,
-          odometroF: odometroF
+        novaColeta = {};
+
+        const response = await api.post('api/transportadora/verificarPlaca', {
+          placa: placaState
         })
+        const responseColetaEmAberto = await api.post('api/coleta/coletaEmAbertoPorVeiculo', {
+          veiculo: response.data.motorista.VEICULO
+        })
+
+        if (responseColetaEmAberto.data.coleta) {
+          novaColeta = responseColetaEmAberto.data.coleta;
+        } else {
+          const responseColeta = await api.post('api/coleta/NovaColeta', {
+            data: data,
+            transportador: response.data.motorista.COD_TRANSPORTADORA,
+            motorista: response.data.motorista.COD_MOTORISTA,
+            veiculo: response.data.motorista.VEICULO,
+            odometroI: odometroI,
+            odometroF: odometroF,
+            id_pesagem: ''
+          })
+          novaColeta = responseColeta.data;
+        }
 
         var coletaRequest = [];
         coleta.map((coleta) => {
@@ -244,7 +256,7 @@ const Transferir = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, 
                   temp = parseFloat(coletaItem.temperatura)
                 }
                 coletaUnidade = {
-                  id_coleta: responseColeta.data.id,
+                  id_coleta: novaColeta.id,
                   id: coletaItem.id,
                   codigo: coletaItem.codigo,
                   codigo_cacal: coletaItem.codigo_cacal,
@@ -276,7 +288,7 @@ const Transferir = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, 
                 temp = parseFloat(coletaItem.temperatura)
               }
               coletaUnidade = {
-                id_coleta: responseColeta.data.id,
+                id_coleta: novaColeta.id,
                 id: coletaItem.id,
                 codigo: coletaItem.codigo,
                 codigo_cacal: coletaItem.codigo_cacal,

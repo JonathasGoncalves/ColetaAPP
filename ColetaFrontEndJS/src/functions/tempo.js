@@ -3,7 +3,6 @@
 export function date() {
   data = new Date;
 
-
   if (data.getMonth() + 1 < 10) {
     mes = '0' + (data.getMonth() + 1)
   } else {

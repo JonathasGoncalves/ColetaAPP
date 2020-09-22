@@ -1,0 +1,18 @@
+http://apicoletaleite.selita.coop.br/api/coleta/coletaEmAbertoPorPlaca/placa
+	Retorna a coleta que esta em aberto da placa
+
+http://apicoletaleite.selita.coop.br/api/coleta/RetornaColetaPesagem/1
+	Retorna o arquivo da coleta 
+
+http://apicoletaleite.selita.coop.br/api/coleta/RetornaOcorrencia/id_coleta
+	Retorna o arquivo de ocorrencias da coleta
+
+http://apicoletaleite.selita.coop.br/api/coleta/RetornaCoordenada/id_coleta
+	Retorna o arquivo de localidade da coleta
+
+http://apicoletaleite.selita.coop.br/api/coleta/finalizarColetaImport/id_coleta
+	Finaliza a coleta (marca como importada e adiciona o id da pesagem ou similar)
+
+http://apicoletaleite.selita.coop.br/api/coleta/estornoColeta/id_coleta
+	Estorna a coleta (Marca a coleta como em aberto novamente)
+

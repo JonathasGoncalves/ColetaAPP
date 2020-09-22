@@ -55,7 +55,6 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
     });
 
     NetInfo.fetch().then(state => {
-      console.log(state.isConnected);
       setIsConnected(state.isConnected);
     });
 
@@ -216,14 +215,34 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
         const odometroI = await AsyncStorage.getItem('@OdometroI');
         const odometroF = await AsyncStorage.getItem('@OdometroF');
 
-        const responseColeta = await api.post('api/coleta/NovaColeta', {
-          data: data,
-          transportador: veiculo.COD_TRANSPORTADORA,
-          motorista: veiculo.COD_MOTORISTA,
-          veiculo: veiculo.VEICULO,
-          odometroI: odometroI,
-          odometroF: odometroF
+        novaColeta = {};
+        const response = await api.post('api/transportadora/verificarPlaca', {
+          placa: veiculo.PLACA
         })
+
+
+
+        const responseColetaEmAberto = await api.post('api/coleta/coletaEmAbertoPorVeiculo', {
+          veiculo: response.data.motorista.VEICULO
+        })
+
+
+
+        if (responseColetaEmAberto.data.coleta) {
+          novaColeta = responseColetaEmAberto.data.coleta;
+        } else {
+          const responseColeta = await api.post('api/coleta/NovaColeta', {
+            data: data,
+            transportador: veiculo.COD_TRANSPORTADORA,
+            motorista: veiculo.COD_MOTORISTA,
+            veiculo: veiculo.VEICULO,
+            odometroI: odometroI,
+            odometroF: odometroF,
+            id_pesagem: ''
+          })
+
+          novaColeta = responseColeta.data;
+        }
 
         var coletaRequest = [];
         coleta.map((coleta) => {
@@ -240,7 +259,7 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
                   temp = parseFloat(coletaItem.temperatura)
                 }
                 coletaUnidade = {
-                  id_coleta: responseColeta.data.id,
+                  id_coleta: novaColeta.id,
                   id: coletaItem.id,
                   codigo: coletaItem.codigo,
                   codigo_cacal: coletaItem.codigo_cacal,
@@ -272,7 +291,7 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
                 temp = parseFloat(coletaItem.temperatura)
               }
               coletaUnidade = {
-                id_coleta: responseColeta.data.id,
+                id_coleta: novaColeta.id,
                 id: coletaItem.id,
                 codigo: coletaItem.codigo,
                 codigo_cacal: coletaItem.codigo_cacal,
@@ -298,8 +317,6 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
             }
           })
         })
-
-
         try {
           const responseTanques = await api.post('api/coleta/NovaColetaItem', {
             coletas: coletaRequest
@@ -317,7 +334,13 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
           console.log(error);
         }
       } catch (error) {
-        console.log(error);
+        Alert.alert(
+          'Erro!',
+          'Não foi possivel transmitir a coleta. Verifique sua conezão com a internet e tente novamente.',
+          [
+            { text: 'ok', onPress: () => sair() },
+          ]
+        );
       }
 
       Alert.alert(
