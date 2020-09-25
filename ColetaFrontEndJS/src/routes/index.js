@@ -82,7 +82,6 @@ function Routes({
             client_id: clientID,
             client_secret: clientSecret
           })
-
           await AsyncStorage.setItem('@access_token', responseToken.data.access_token);
           await AsyncStorage.setItem('@expires_in', String(responseToken.data.expires_in));
         }

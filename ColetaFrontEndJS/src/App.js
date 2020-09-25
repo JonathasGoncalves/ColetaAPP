@@ -11,7 +11,10 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import { faCheckSquare, faCoffee, faBars, faArrowLeft, faTrash } from '@fortawesome/free-solid-svg-icons';
 import AsyncStorage from '@react-native-community/async-storage';
-
+/*
+Conta de update:
+Servicos.ti@selita.coop.br
+*/
 function App() {
 
   const [updateController, setUpdateController] = useState(true);

@@ -128,8 +128,6 @@ const Cadastro = ({ save_coleta, adicionar_horaI, adicionar_data, saveVeiculo, s
   }
 
   return (
-
-
     <Container style={{ backgroundColor: 'white', flex: 1 }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -153,7 +151,6 @@ const Cadastro = ({ save_coleta, adicionar_horaI, adicionar_data, saveVeiculo, s
                   value={placa}
                   onChangeText={text => setPlaca(text)}
                 />
-
               </View>
 
               <View>
@@ -178,8 +175,6 @@ const Cadastro = ({ save_coleta, adicionar_horaI, adicionar_data, saveVeiculo, s
                 </Button>
               </View>
             </View>
-
-
 
             {loading && <ActivityIndicator size='large' color='green' style={{ marginTop: 20 }} />}
           </View>

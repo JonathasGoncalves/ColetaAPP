@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     marginTop: 2,
     minHeight: 70,
-    width: (Dimensions.get("window").width) * 0.8,
+    //width: (Dimensions.get("window").width) * 0.8,
   },
   viewItemLatao: {
     borderRadius: 5,
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 2,
     backgroundColor: 'white',
-    height: (Dimensions.get("window").height) * 0.8,
+    //height: (Dimensions.get("window").height) * 0.8,
   },
   viewTotalColetado: {
     backgroundColor: '#e5e8e8',
@@ -109,7 +109,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     //alignSelf: 'center',
     alignItems: 'center',
-    height: Dimensions.get("window").height * 0.2,
+    //height: Dimensions.get("window").height * 0.2,
+    height: 80,
     width: Dimensions.get("window").width * 0.5,
   },
   textTitulo: {

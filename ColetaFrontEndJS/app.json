@@ -1,10 +1,16 @@
 {
-  "name": "APPColeta",
-  "displayName": "APPColeta",
+  "name": "Coleta",
+  "displayName": "Coleta",
   "expo": {
-    "name": "APPColeta",
-    "slug": "APPColeta",
+    "name": "Coleta",
+    "slug": "Coleta",
     "version": "1.0.0",
+    "icon": "./assets/icone_2.png",
+    "splash": {
+      "image": "./assets/Splash3.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "assetBundlePatterns": [
       "**/*"
     ]
@@ -15,7 +21,6 @@
   ],
   "android": {
     "package": "com.selita.appBareUpdate",
-    "versionCode": 1,
-    "publishManifestPath": "https://exp.host/@jonathasgoncalves/APPColeta"
+    "versionCode": 1
   }
 }
