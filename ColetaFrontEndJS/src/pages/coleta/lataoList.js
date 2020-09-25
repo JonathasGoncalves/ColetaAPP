@@ -122,22 +122,22 @@ const LataoList = ({ salvar_total_coletadoOff, salvar_total_coletado, totalColet
   }
 
   return (
-    <View>
-      <View style={styles.viewMainFlatList}>
+    <View style={{ flex: 1, justifyContent: 'space-between' }}>
+      <View styles={styles.viewMainFlatList}>
         <FlatList
           data={tanqueAtual.lataoList}
           keyExtractor={item => item.latao}
           renderItem={({ item }) => renderLataoList(item)}
         />
       </View>
-      <View style={{ flexDirection: 'row', flex: 1 }}>
+      <View style={styles.ViewTotal}>
         <View style={styles.viewTotalColetado}>
-          <Text style={styles.textTotalColetado}>Total Coletado</Text>
-          <Text style={styles.ValueTotalColetado}>{totalColetado}</Text>
+          <Text allowFontScaling={false} style={styles.textTotalColetado}>Total Coletado</Text>
+          <Text allowFontScaling={false} style={styles.ValueTotalColetado}>{totalColetado}</Text>
         </View>
         <View style={styles.viewTotalColetado}>
-          <Text style={styles.textTotalColetado}>Total Fora do Padrão</Text>
-          <Text style={styles.ValueTotalColetado}>{totalColetadoOff}</Text>
+          <Text allowFontScaling={false} style={styles.textTotalColetado}>Total Fora do Padrão</Text>
+          <Text allowFontScaling={false} style={styles.ValueTotalColetado}>{totalColetadoOff}</Text>
         </View>
       </View>
     </View>

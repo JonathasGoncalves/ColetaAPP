@@ -5,12 +5,6 @@
     "name": "Coleta",
     "slug": "Coleta",
     "version": "1.0.0",
-    "icon": "./assets/icone_2.png",
-    "splash": {
-      "image": "./assets/Splash3.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "assetBundlePatterns": [
       "**/*"
     ]

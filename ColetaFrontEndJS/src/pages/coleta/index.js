@@ -235,10 +235,10 @@ const Coleta = ({ salvar_total_coletado, salvar_total_coletadoOff, totalColetado
   }
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       {coleta.length > 0 && coleta[id_linha].coleta.length > 0 ?
         (
-          <View>
+          <View style={{ flex: 1, justifyContent: 'space-between' }}>
 
             <View style={styles.viewMainFlatList}>
               <Text maxFontSizeMultiplier={1} style={styles.textTitulo}>{coleta[id_linha].coleta[0].descricao}</Text>
@@ -248,17 +248,17 @@ const Coleta = ({ salvar_total_coletado, salvar_total_coletadoOff, totalColetado
                 renderItem={({ item }) => renderTanque(item)}
               />
             </View>
-
-            <View style={{ flexDirection: 'row', flex: 1 }}>
+            <View style={{ flexDirection: 'row', height: 80 }}>
               <View style={styles.viewTotalColetado}>
-                <Text style={styles.textTotalColetado}>Total Coletado</Text>
-                <Text style={styles.ValueTotalColetado}>{totalColetado}</Text>
+                <Text allowFontScaling={false} style={styles.textTotalColetado}>Total Coletado</Text>
+                <Text allowFontScaling={false} style={styles.ValueTotalColetado}>{totalColetado}</Text>
               </View>
               <View style={styles.viewTotalColetado}>
-                <Text style={styles.textTotalColetado}>Total Fora do Padrão</Text>
-                <Text style={styles.ValueTotalColetado}>{totalColetadoOff}</Text>
+                <Text allowFontScaling={false} style={styles.textTotalColetado}>Total Fora do Padrão</Text>
+                <Text allowFontScaling={false} style={styles.ValueTotalColetado}>{totalColetadoOff}</Text>
               </View>
             </View>
+
 
           </View>
         ) : (

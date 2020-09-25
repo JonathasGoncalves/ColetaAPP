@@ -18,108 +18,169 @@ import getRealm from '../../../services/realm';
 import Realm from 'realm';
 import * as actionsColeta from '../../../store/actions/coletaActions';
 import { time, date } from '../../../functions/tempo';
+import * as Updates from 'expo-updates';
+import NetInfo from "@react-native-community/netinfo";
 
 const Cadastro = ({ save_coleta, adicionar_horaI, adicionar_data, saveVeiculo, save_linhas }) => {
   const [placa, setPlaca] = useState('');
   const [odometro, setOdometro] = useState('');
   const [loading, setLoading] = useState(false);
+  const [updateController, setUpdateController] = useState(true);
+  const [isConnected, setIsConnected] = useState(true);
+
+  useEffect(() => {
+
+    NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected);
+    });
+
+    NetInfo.fetch().then(state => {
+      setIsConnected(state.isConnected);
+    });
+
+
+    async function updateAPP() {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          const updateEnd = await Updates.fetchUpdateAsync();
+          setUpdateController(false);
+          await Updates.reloadAsync();
+        } else {
+          setUpdateController(false);
+        }
+      } catch (e) {
+
+        if (!isConnected) {
+          Alert.alert(
+            'Sem internet!',
+            'Não é possivel verificar atualizações sem internet. Conecte-se e reinicie o APP!',
+            [
+              { text: 'OK' },
+            ]
+          );
+        } else {
+          Alert.alert(
+            'Erro ao atualizar o APP!',
+            `Erro ${e}`,
+            [
+              { text: 'OK' },
+            ]
+          );
+        }
+        setUpdateController(false);
+      }
+    }
+    updateAPP();
+  }, [])
 
   async function salvarPlaca() {
 
-    setLoading(true);
+    if (!isConnected) {
+      Alert.alert(
+        'Sem conexão com a internet!',
+        'É necessário se conectar para iniciar a coleta!',
+        [
+          { text: 'OK' },
+        ]
+      );
+    } else {
+      setLoading(true);
 
-    const imeiLocal = getUniqueId();
-    try {
+      const imeiLocal = getUniqueId();
       try {
-        const response = await api.post('api/transportadora/verificarPlaca', {
-          placa: placa
-        })
-
         try {
-
-          await AsyncStorage.setItem('@veiculo', JSON.stringify(response.data.motorista));
-
-          const tempVeiculo = await AsyncStorage.getItem('@veiculo');
-
-          const responseLinhas = await api.post('api/linha/linhasPorVeiculo', {
-            veiculo: response.data.motorista.VEICULO
-          })
-          console.log(responseLinhas);
-          linhas = [];
-          for (linhaItem of responseLinhas.data.linhas) {
-            linhas.push(linhaItem.linha);
-          }
-          const responseTanques = await api.post('api/tanque/TanquesInLinhas', {
-            linhas: linhas
-          });
-          save_linhas(linhas);
-          await AsyncStorage.setItem('@OdometroI', odometro);
-          await AsyncStorage.setItem('@linhas', JSON.stringify(linhas));
-          //gerando array de array para as possiveis coletas de cada linha
-          //o indice do array é o codigo da linha
-
-          const realm = await getRealm();
-          temp = [];
-
-          let allTanque = realm.objects('Tanque');
-          realm.write(() => {
-            realm.delete(allTanque)
+          const response = await api.post('api/transportadora/verificarPlaca', {
+            placa: placa
           })
 
-          for (tanqueItem of responseTanques.data.tanques) {
-            tanqueUnidade = {
-              id: tanqueItem.id,
-              codigo: tanqueItem.codigo,
-              codigo_cacal: tanqueItem.codigo_cacal,
-              tanque: tanqueItem.tanque,
-              latao: tanqueItem.latao,
-              LINHA: tanqueItem.linha,
-              descricao: tanqueItem.descricao,
-              ATUALIZAR_COORDENADA: tanqueItem.ATUALIZAR_COORDENADA,
-              lataoQuant: tanqueItem.lataoQuant
-            };
-            temp.push(tanqueUnidade);
-            realm.write(() => {
-              realm.create('Tanque', tanqueUnidade);
+          try {
+
+            await AsyncStorage.setItem('@veiculo', JSON.stringify(response.data.motorista));
+
+            const tempVeiculo = await AsyncStorage.getItem('@veiculo');
+
+            const responseLinhas = await api.post('api/linha/linhasPorVeiculo', {
+              veiculo: response.data.motorista.VEICULO
+            })
+            console.log(responseLinhas);
+            linhas = [];
+            for (linhaItem of responseLinhas.data.linhas) {
+              linhas.push(linhaItem.linha);
+            }
+            const responseTanques = await api.post('api/tanque/TanquesInLinhas', {
+              linhas: linhas
             });
+            save_linhas(linhas);
+            await AsyncStorage.setItem('@OdometroI', odometro);
+            await AsyncStorage.setItem('@linhas', JSON.stringify(linhas));
+            //gerando array de array para as possiveis coletas de cada linha
+            //o indice do array é o codigo da linha
+
+            const realm = await getRealm();
+            temp = [];
+
+            let allTanque = realm.objects('Tanque');
+            realm.write(() => {
+              realm.delete(allTanque)
+            })
+
+            for (tanqueItem of responseTanques.data.tanques) {
+              tanqueUnidade = {
+                id: tanqueItem.id,
+                codigo: tanqueItem.codigo,
+                codigo_cacal: tanqueItem.codigo_cacal,
+                tanque: tanqueItem.tanque,
+                latao: tanqueItem.latao,
+                LINHA: tanqueItem.linha,
+                descricao: tanqueItem.descricao,
+                ATUALIZAR_COORDENADA: tanqueItem.ATUALIZAR_COORDENADA,
+                lataoQuant: tanqueItem.lataoQuant
+              };
+              temp.push(tanqueUnidade);
+              realm.write(() => {
+                realm.create('Tanque', tanqueUnidade);
+              });
+            }
+
+            const hora = time();
+            const data = date();
+
+            adicionar_horaI(hora);
+            adicionar_data(data);
+            await AsyncStorage.setItem('@horaI', hora);
+            await AsyncStorage.setItem('@data', data);
+            await AsyncStorage.setItem('@emAberto', 'true');
+            save_coleta([]);
+            saveVeiculo(response.data.motorista);
+
+          } catch (error) {
+            console.log(error);
+            Alert.alert(
+              'Erro',
+              'Não foi possivel carregar as informações!',
+              [
+                { text: 'ok' },
+              ]
+            );
           }
-
-          const hora = time();
-          const data = date();
-
-          adicionar_horaI(hora);
-          adicionar_data(data);
-          await AsyncStorage.setItem('@horaI', hora);
-          await AsyncStorage.setItem('@data', data);
-          await AsyncStorage.setItem('@emAberto', 'true');
-          save_coleta([]);
-          saveVeiculo(response.data.motorista);
 
         } catch (error) {
           console.log(error);
           Alert.alert(
             'Erro',
-            'Não foi possivel carregar as informações!',
+            'Placa inválida!',
             [
               { text: 'ok' },
             ]
           );
         }
-
       } catch (error) {
         console.log(error);
-        Alert.alert(
-          'Erro',
-          'Placa inválida!',
-          [
-            { text: 'ok' },
-          ]
-        );
       }
-    } catch (error) {
-      console.log(error);
+      setLoading(false);
     }
-    setLoading(false);
+
   }
 
   function setOdometroAction(text) {
@@ -139,42 +200,51 @@ const Cadastro = ({ save_coleta, adicionar_horaI, adicionar_data, saveVeiculo, s
             flex: 1,
             justifyContent: "space-around"
           }}>
-            <View >
-              <View>
-                <Image style={{ alignSelf: 'center' }} source={require('../../coleta/imagens/iconeCaminhao.jpg')} />
-                <Text allowFontScaling={false} style={styles.textDescPlaca}>
-                  Por favor digite a placa do seu veiculo no campo abaixo
-              </Text>
-                <TextInput
-                  editable={!loading}
-                  style={styles.inputPlaca}
-                  value={placa}
-                  onChangeText={text => setPlaca(text)}
-                />
+            {updateController ? (
+              <View style={styles.container}>
+                <ActivityIndicator size='large' color='green' />
+                <Text allowFontScaling={false} allowFontScaling={false} >Atualizando versão do APP...</Text>
               </View>
+            ) : (
+                <View >
+                  <View>
+                    <Image style={{ alignSelf: 'center' }} source={require('../../coleta/imagens/iconeCaminhao.jpg')} />
+                    <Text allowFontScaling={false} style={styles.textDescPlaca}>
+                      Por favor digite a placa do seu veiculo no campo abaixo
+              </Text>
+                    <TextInput
+                      editable={!loading}
+                      style={styles.inputPlaca}
+                      value={placa}
+                      onChangeText={text => setPlaca(text)}
+                    />
+                  </View>
 
-              <View>
-                <Text allowFontScaling={false} style={styles.textDescPlaca}>
-                  Odômetro Inicial
+                  <View>
+                    <Text allowFontScaling={false} style={styles.textDescPlaca}>
+                      Odômetro Inicial
               </Text>
-                <TextInput
-                  keyboardType='numeric'
-                  editable={!loading}
-                  style={styles.inputPlaca}
-                  value={odometro}
-                  onChangeText={text => setOdometroAction(text)}
-                />
-                <Button
-                  block
-                  style={loading || placa.length <= 0 || odometro.length <= 0 ? styles.buttonContinuarPress : styles.buttonContinuar}
-                  rounded={true}
-                  onPress={salvarPlaca}
-                  disabled={loading || placa.length <= 0 || odometro.length <= 0}
-                >
-                  <Text allowFontScaling={false} style={styles.textButtonContinuar}>Continuar</Text>
-                </Button>
-              </View>
-            </View>
+                    <TextInput
+                      keyboardType='numeric'
+                      editable={!loading}
+                      style={styles.inputPlaca}
+                      value={odometro}
+                      onChangeText={text => setOdometroAction(text)}
+                    />
+                    <Button
+                      block
+                      style={loading || placa.length <= 0 || odometro.length <= 0 ? styles.buttonContinuarPress : styles.buttonContinuar}
+                      rounded={true}
+                      onPress={salvarPlaca}
+                      disabled={loading || placa.length <= 0 || odometro.length <= 0}
+                    >
+                      <Text allowFontScaling={false} style={styles.textButtonContinuar}>Continuar</Text>
+                    </Button>
+                  </View>
+                </View>
+              )
+            }
+
 
             {loading && <ActivityIndicator size='large' color='green' style={{ marginTop: 20 }} />}
           </View>

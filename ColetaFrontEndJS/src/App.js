@@ -11,13 +11,14 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import { faCheckSquare, faCoffee, faBars, faArrowLeft, faTrash } from '@fortawesome/free-solid-svg-icons';
 import AsyncStorage from '@react-native-community/async-storage';
+import NetInfo from "@react-native-community/netinfo";
+
 /*
 Conta de update:
 Servicos.ti@selita.coop.br
 */
 function App() {
 
-  const [updateController, setUpdateController] = useState(true);
 
   useEffect(() => {
     //adicionando icones globalmente
@@ -26,29 +27,6 @@ function App() {
     } catch (error) {
       console.log(error);
     }
-
-    async function updateAPP() {
-      try {
-        const update = await Updates.checkForUpdateAsync();
-        if (update.isAvailable) {
-          const updateEnd = await Updates.fetchUpdateAsync();
-          setUpdateController(false);
-          await Updates.reloadAsync();
-        } else {
-          setUpdateController(false);
-        }
-      } catch (e) {
-        Alert.alert(
-          'Erro',
-          `Erro ${e}`,
-          [
-            { text: 'OK' },
-          ]
-        );
-        setUpdateController(false);
-      }
-    }
-    updateAPP();
   }, [])
 
   const MyTheme = {
@@ -61,15 +39,7 @@ function App() {
   return (
     <Provider store={store}>
       <NavigationContainer theme={MyTheme}>
-        {updateController ? (
-          <View style={styles.container}>
-            <ActivityIndicator size='large' color='green' />
-            <Text allowFontScaling={false} allowFontScaling={false} >Atualizando versão do APP...</Text>
-          </View>
-        ) : (
-            <Routes />
-          )
-        }
+        <Routes />
         <StatusBar style="auto" />
       </NavigationContainer>
     </Provider>

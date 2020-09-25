@@ -133,10 +133,9 @@ const Linha = ({ totalColetado, totalColetadoOff, save_linhaID, coleta, linhas, 
     <View style={styles.viewMain}>
 
       {linhasRender.length > 0 ? (
-        <View>
-
+        <View style={{ flex: 1, justifyContent: 'space-between' }}>
           <View style={styles.viewMainFlatList}>
-            <Text allowFontScaling={false} style={styles.textTitulo}>Selecione a linha</Text>
+            <Text allowFontScaling={false} style={styles.textTitulo}>Selecione a linha teste</Text>
             <FlatList
               data={linhasRender}
               keyExtractor={item => item.id}
@@ -144,14 +143,14 @@ const Linha = ({ totalColetado, totalColetadoOff, save_linhaID, coleta, linhas, 
             />
           </View>
 
-          <View style={{ flexDirection: 'row', flex: 1 }}>
+          <View style={{ flexDirection: 'row', height: 80 }}>
             <View style={styles.viewTotalColetado}>
-              <Text style={styles.textTotalColetado}>Total Coletado</Text>
-              <Text style={styles.ValueTotalColetado}>{totalColetado}</Text>
+              <Text allowFontScaling={false} style={styles.textTotalColetado}>Total Coletado</Text>
+              <Text allowFontScaling={false} style={styles.ValueTotalColetado}>{totalColetado}</Text>
             </View>
             <View style={styles.viewTotalColetado}>
-              <Text style={styles.textTotalColetado}>Total Fora do Padrão</Text>
-              <Text style={styles.ValueTotalColetado}>{totalColetadoOff}</Text>
+              <Text allowFontScaling={false} style={styles.textTotalColetado}>Total Fora do Padrão</Text>
+              <Text allowFontScaling={false} style={styles.ValueTotalColetado}>{totalColetadoOff}</Text>
             </View>
           </View>
 

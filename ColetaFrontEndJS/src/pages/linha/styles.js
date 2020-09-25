@@ -15,11 +15,12 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   viewMainFlatList: {
+    flex: 1,
     marginRight: 10,
     marginLeft: 10,
     marginTop: 2,
     backgroundColor: 'white',
-    height: (Dimensions.get("window").height) * 0.8,
+    //height: (Dimensions.get("window").height) * 0.8,
   },
   textButtonContinuar: {
     fontSize: 20,
@@ -55,6 +56,7 @@ const styles = StyleSheet.create({
     //marginLeft: 10
   },
   viewMain: {
+    flex: 1,
     marginRight: 10,
     //marginLeft: 10,
     marginTop: 2,
@@ -66,12 +68,14 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   viewTotalColetado: {
+    flex: 1,
     backgroundColor: '#e5e8e8',
     //marginLeft: 10,
     marginTop: 10,
     //alignSelf: 'center',
     alignItems: 'center',
-    height: Dimensions.get("window").height * 0.2,
+    //height: 80,
+    //height: Dimensions.get("window").height * 0.2,
     width: Dimensions.get("window").width * 0.5,
   },
   ValueTotalColetado: {
