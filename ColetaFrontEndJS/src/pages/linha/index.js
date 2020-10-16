@@ -135,7 +135,7 @@ const Linha = ({ totalColetado, totalColetadoOff, save_linhaID, coleta, linhas, 
       {linhasRender.length > 0 ? (
         <View style={{ flex: 1, justifyContent: 'space-between' }}>
           <View style={styles.viewMainFlatList}>
-            <Text allowFontScaling={false} style={styles.textTitulo}>Selecione a linha teste</Text>
+            <Text allowFontScaling={false} style={styles.textTitulo}>Selecione a linha</Text>
             <FlatList
               data={linhasRender}
               keyExtractor={item => item.id}

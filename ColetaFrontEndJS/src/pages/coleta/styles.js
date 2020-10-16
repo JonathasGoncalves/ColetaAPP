@@ -198,6 +198,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center'
   },
+  inputSearch: {
+    //flex: 1,
+    //borderWidth: 1,
+    //minHeight: 40,
+    //borderRadius: 5,
+    //marginTop: 5,
+    //marginBottom: 20,
+    //marginLeft: 10,
+    //marginRight: 10,
+    fontSize: 16,
+    textAlign: 'center',
+    backgroundColor: 'white',
+    color: 'white'
+  },
   buttonContinuar: {
     width: 200,
     backgroundColor: '#F9690E',

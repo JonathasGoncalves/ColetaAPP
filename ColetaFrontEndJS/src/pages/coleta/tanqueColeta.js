@@ -193,13 +193,17 @@ const TanqueColeta = ({ salvar_total_coletado, salvar_total_coletadoOff, id_linh
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <View style={{
-          padding: 24,
-          flex: 1,
-          justifyContent: "space-around"
-        }}>
-          <View>
-            <ScrollView>
+        <ScrollView>
+          <View style={{
+            marginBottom: 80,
+            marginTop: 25,
+            marginLeft: 25,
+            marginRight: 25,
+            flex: 1,
+            justifyContent: "space-around"
+          }}>
+
+            <View>
               <Text allowFontScaling={false} style={styles.textTitulo}>Odômetro</Text>
               <TextInput
                 maxLength={9}
@@ -321,28 +325,30 @@ const TanqueColeta = ({ salvar_total_coletado, salvar_total_coletadoOff, id_linh
                   </>
                 }
               </View>
-            </ScrollView>
-            <Button
-              block
-              style={(obsType == '' && (odometro.length <= 0 || temperatura.length <= 0) || (obsType != '' && (odometro.length <= 0)) || (obsType == '003' && (volume.length <= 0)) ||
-                (obsType == '004' && (obs.length <= 0)) ||
-                loading || tempInvalida) ? styles.buttonContinuarPress : styles.buttonContinuar}
-              rounded={true}
-              onPress={onPressInfo}
-              disabled={
-                (
-                  odometro.length <= 0 ||
-                  (obsType == '' && (odometro.length <= 0 || temperatura.length <= 0)) ||
-                  (obsType == '003' && (volume.length <= 0))) ||
-                (obsType == '004' && (obs.length <= 0) ||
-                  loading || tempInvalida
-                )
-              }
-            >
-              <Text allowFontScaling={false} style={styles.textButtonContinuar}>Continuar</Text>
-            </Button>
+
+              <Button
+                block
+                style={(obsType == '' && (odometro.length <= 0 || temperatura.length <= 0) || (obsType != '' && (odometro.length <= 0)) || (obsType == '003' && (volume.length <= 0)) ||
+                  (obsType == '004' && (obs.length <= 0)) ||
+                  loading || tempInvalida) ? styles.buttonContinuarPress : styles.buttonContinuar}
+                rounded={true}
+                onPress={onPressInfo}
+                disabled={
+                  (
+                    odometro.length <= 0 ||
+                    (obsType == '' && (odometro.length <= 0 || temperatura.length <= 0)) ||
+                    (obsType == '003' && (volume.length <= 0))) ||
+                  (obsType == '004' && (obs.length <= 0) ||
+                    loading || tempInvalida
+                  )
+                }
+              >
+                <Text allowFontScaling={false} style={styles.textButtonContinuar}>Continuar</Text>
+              </Button>
+            </View>
+
           </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </Container >
   );

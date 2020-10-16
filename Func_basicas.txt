@@ -43,11 +43,14 @@ Ação ColetaPorPlaca
 Formato arquivo enviado:
 Data      Transportador   Motorista     Veiculo
 20200608   00468           0000019       000001
+20200922   00093           4000063       000094
 
 Arquivo coleta
 Linha  Produtor Tanque Latão  Quantidade  hora  Temp   boca 
 000054 000000   000017  001769 00000000229 1634  3,00   1
 
+0000010000340039340000000033308460331
+0000540000170017690000000022916343,001
 
 
 linha, tanque, data, hora, cod_ocorrencia, valor fora do padrao, observações

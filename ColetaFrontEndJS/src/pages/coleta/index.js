@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ActivityIndicator, FlatList, TouchableOpacity, Alert, TextInput } from 'react-native';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actionsColeta from '../../store/actions/coletaActions';
@@ -13,14 +13,12 @@ import AsyncStorage from '@react-native-community/async-storage';
 import Finalizar from './finalizarColeta';
 import { CommonActions } from '@react-navigation/native';
 import calcularTotalColetado from '../../functions/totalColeta';
+import { SearchBar } from 'react-native-elements';
 
 const Coleta = ({ salvar_total_coletado, salvar_total_coletadoOff, totalColetado, totalColetadoOff, id_linha, linhas, cod_linha, navigation, save_coleta, save_tanque, coleta, tanqueAtual, data }) => {
 
-  const [tanques, setTanques] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [lataoCont, setLataoCont] = useState(true);
-  const [totalColetadoState, setTotalColetado] = useState(0);
-  const [totalColetadoOffState, setTotalColetadoOffState] = useState(0);
+  const [tanque, setTanque] = useState('');
+  const [tanquesFiltro, setTanquesFiltro] = useState([]);
 
   useEffect(() => {
 
@@ -31,6 +29,9 @@ const Coleta = ({ salvar_total_coletado, salvar_total_coletadoOff, totalColetado
         </View>
       ),
     });
+
+    //iniciando array de tanques 
+    setTanquesFiltro(coleta[id_linha].coleta)
 
     function goBack() {
       //limparCampos();
@@ -142,6 +143,31 @@ const Coleta = ({ salvar_total_coletado, salvar_total_coletadoOff, totalColetado
     AsyncStorage.setItem('@tanqueAtual', JSON.stringify(tanque));
     navigation.navigate('Tanque');
   }
+
+  async function filtrarTanque(inputTanque) {
+
+    if (tanque.length <= inputTanque.length && tanquesFiltro) {
+      var find = tanquesFiltro.filter(function (tanqueItem) {
+        return tanqueItem.tanque.includes(inputTanque);
+      });
+    } else {
+      var find = coleta[id_linha].coleta.filter(function (tanqueItem) {
+        return tanqueItem.tanque.includes(inputTanque);
+      });
+    }
+
+    setTanquesFiltro(find);
+
+
+  }
+
+  //Validar valor de entrada para o tanque
+  function setTanqueAction(text) {
+    newText = text.replace(/[^0-9]/g, '');
+    setTanque(newText);
+    filtrarTanque(newText);
+  }
+
   //renderiza item da lista
   function renderTanque(tanque) {
 
@@ -239,11 +265,19 @@ const Coleta = ({ salvar_total_coletado, salvar_total_coletadoOff, totalColetado
       {coleta.length > 0 && coleta[id_linha].coleta.length > 0 ?
         (
           <View style={{ flex: 1, justifyContent: 'space-between' }}>
-
+            <Text maxFontSizeMultiplier={1} style={styles.textTitulo}>{coleta[id_linha].coleta[0].descricao}</Text>
+            <SearchBar
+              keyboardType='numeric'
+              placeholder="Buscar Tanque"
+              onChangeText={text => setTanqueAction(text)}
+              value={tanque}
+              containerStyle={{ backgroundColor: 'white', borderRadius: 10, padding: 10, borderWidth: 2, flex: 1, minHeight: 40, maxHeight: 70, marginLeft: 10, marginRight: 10 }}
+              inputContainerStyle={{ backgroundColor: 'white', borderWidth: 0 }}
+              inputStyle={{ backgroundColor: 'white', borderWidth: 0 }}
+            />
             <View style={styles.viewMainFlatList}>
-              <Text maxFontSizeMultiplier={1} style={styles.textTitulo}>{coleta[id_linha].coleta[0].descricao}</Text>
               <FlatList
-                data={coleta[id_linha].coleta}
+                data={tanquesFiltro}
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => renderTanque(item)}
               />

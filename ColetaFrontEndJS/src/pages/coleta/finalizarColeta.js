@@ -222,12 +222,19 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
 
 
 
-        const responseColetaEmAberto = await api.post('api/coleta/coletaEmAbertoPorVeiculo', {
-          veiculo: response.data.motorista.VEICULO
+        await api.post('api/coleta/NovaColeta', {
+          data: data,
+          transportador: veiculo.COD_TRANSPORTADORA,
+          motorista: veiculo.COD_MOTORISTA,
+          veiculo: veiculo.VEICULO,
+          odometroI: odometroI,
+          odometroF: odometroF,
+          id_pesagem: ''
         })
 
-
-
+        /*const responseColetaEmAberto = await api.post('api/coleta/coletaEmAbertoPorVeiculo', {
+          veiculo: response.data.motorista.VEICULO
+        })
         if (responseColetaEmAberto.data.coleta) {
           novaColeta = responseColetaEmAberto.data.coleta;
         } else {
@@ -243,6 +250,8 @@ const Finalizar = ({ removerID, id_coleta, linhas, coleta, data, horaI, horaF, n
 
           novaColeta = responseColeta.data;
         }
+        */
+
 
         var coletaRequest = [];
         coleta.map((coleta) => {
